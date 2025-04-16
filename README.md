@@ -9,6 +9,7 @@ Dise, Panos Panagos, Pasquale Borrelli
 - [Grassland (Part1)](#grassland-part1)
 - [Cropland (Part1)](#cropland-part1)
 - [Forest (Part1)](#forest-part1)
+- [Grassland (Part2)](#grassland-part2)
 
 We introduce SHERPA (Soil Health Evaluation, Rating Protocol, and
 Assessment) as a framework and present a first assessment across Europe.
@@ -116,7 +117,32 @@ library(viridis)
 ``` r
 library(ggplot2)
 library(foreign)
+library(tidyverse)
+```
 
+    ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+    ## ✔ forcats   1.0.0     ✔ readr     2.1.4
+    ## ✔ lubridate 1.9.2     ✔ stringr   1.5.0
+    ## ✔ purrr     1.0.1     ✔ tibble    3.2.1
+
+    ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+    ## ✖ dplyr::arrange()   masks plyr::arrange()
+    ## ✖ purrr::compact()   masks plyr::compact()
+    ## ✖ dplyr::count()     masks plyr::count()
+    ## ✖ dplyr::desc()      masks plyr::desc()
+    ## ✖ terra::extract()   masks raster::extract(), tidyr::extract()
+    ## ✖ dplyr::failwith()  masks plyr::failwith()
+    ## ✖ dplyr::filter()    masks stats::filter()
+    ## ✖ dplyr::id()        masks plyr::id()
+    ## ✖ dplyr::lag()       masks stats::lag()
+    ## ✖ dplyr::mutate()    masks plyr::mutate()
+    ## ✖ dplyr::rename()    masks plyr::rename()
+    ## ✖ raster::select()   masks dplyr::select()
+    ## ✖ dplyr::summarise() masks plyr::summarise()
+    ## ✖ dplyr::summarize() masks plyr::summarize()
+    ## ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+
+``` r
 LUCAS_final<- read.csv("C:/Users/surya/Downloads/SHERPA_dataset/Datasets_Sherpa_11_feb/Lucas_data.csv")
 
 colnames(LUCAS_final)
@@ -613,8 +639,6 @@ p <- ggplot(All_data_BO, aes(x = factor(Class, level = level_order), y = Part1_n
 
 print(p)
 ```
-
-    ## Warning: Removed 4 rows containing non-finite values (`stat_boxplot()`).
 
 ![](README_files/figure-gfm/unnamed-chunk-2-2.png)<!-- -->
 
@@ -1244,24 +1268,6 @@ hist(Forest_data$Part1_number)
 ``` r
 All_data_BO<- read.csv("C:/Users/surya/Downloads/SHERPA_dataset/Forest_land_Eur_reg.csv")
 
-colnames(All_data_BO)
-```
-
-    ##  [1] "OBJECTID.." "Shape.."    "Join_Count" "TARGET_FID" "Field1"    
-    ##  [6] "Field1_1"   "code23"     "ddlat"      "ddlong"     "Elevation" 
-    ## [11] "Humus"      "descriptio" "Parent_mat" "RASTERVALU" "Cadmium"   
-    ## [16] "Copper"     "Chromium"   "Cobalt"     "Mercury"    "Manganese" 
-    ## [21] "Nickel"     "Lead"       "Soil_erosi" "Antimony"   "Zn"        
-    ## [26] "LUCAS_medi" "ndep_nhx15" "ndep_nhx16" "ndep_nhx17" "ndep_nhx18"
-    ## [31] "ndep_nhx19" "ndep_noy15" "ndep_noy16" "ndep_noy17" "ndep_noy18"
-    ## [36] "ndep_noy19" "Nsurplus1"  "globalarea" "ndep_nhx_2" "nitrogen_t"
-    ## [41] "net_nitrog" "mean_dep_n" "mean_dep_1" "Soil_ero_1" "Zinc_numbe"
-    ## [46] "Antimony_n" "Lead_numbe" "Nickel_num" "Mercury_nu" "Cobalt_num"
-    ## [51] "Chromium_n" "Copper_num" "Cadmium_nu" "Arsenic_nu" "Nitrogen_n"
-    ## [56] "Part1_numb" "Code"       "Shape_Leng" "Class"      "NewField"  
-    ## [61] "NewField.1"
-
-``` r
 All_data_BO<- All_data_BO[,c(7,59)]
 
 All_data_BO<- merge(Forest_data, All_data_BO, by = "code23")
@@ -1297,3 +1303,182 @@ print(p)
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-4-2.png)<!-- -->
+
+## Grassland (Part2)
+
+``` r
+grid <- list.files("D:/LULC/2020/2020_1/" , pattern = "*.tif$")
+All_cov <- raster::stack(paste0("D:/LULC/2020/2020_1/", grid))
+
+sp.pnts = Grassland[,c("TH_LONG", "TH_LAT")]
+
+data<- terra::extract(All_cov,sp.pnts)
+Grassland1<- cbind(Grassland,data)
+
+# Specify the 5 columns to check (by name or index)
+selected_columns <- c("lccs_class_Layer_2020", "LULC_2019", "LULC_2018", "LULC_2017", "LULC_2016")
+
+# Filter rows where all 5 selected columns have the value 130
+filtered_data <- Grassland1[rowSums(Grassland1[, selected_columns] == 130) == length(selected_columns), ]
+
+grid <- list.files("C:/Users/surya/Downloads/Fcover_data_2018_NC/First_four_months/" , pattern = "*.tif$")
+All_cov <- raster::stack(paste0("C:/Users/surya/Downloads/Fcover_data_2018_NC/First_four_months/", grid))
+
+sp.pnts = filtered_data[,c("TH_LONG", "TH_LAT")]
+data<- terra::extract(All_cov,sp.pnts)
+Grassland1<- cbind(filtered_data,data)
+
+Grassland1$Mean_2018_Fcover1<- Grassland1$Mean_2018_Fcover*100
+
+Grassland1<-Grassland1 %>% mutate(Fcover_number =
+                                    case_when(Mean_2018_Fcover1==100 ~ 10, 
+                                              Mean_2018_Fcover1> 98 &  Mean_2018_Fcover1<100 ~ 9,
+                                              Mean_2018_Fcover1> 95 & Mean_2018_Fcover1<=98~ 8,
+                                              Mean_2018_Fcover1> 90 &  Mean_2018_Fcover1<=95 ~ 7,
+                                              Mean_2018_Fcover1> 80 &  Mean_2018_Fcover1<=90 ~ 6,
+                                              Mean_2018_Fcover1> 75 &  Mean_2018_Fcover1<=80 ~ 5,
+                                              Mean_2018_Fcover1> 70 &  Mean_2018_Fcover1<=75 ~ 4,
+                                              Mean_2018_Fcover1> 65 &  Mean_2018_Fcover1<=70 ~ 3,
+                                              Mean_2018_Fcover1> 60 &  Mean_2018_Fcover1<=65 ~ 2,
+                                              Mean_2018_Fcover1< 60 ~ 1
+                                    )
+)
+
+hist(Grassland1$Mean_2018_Fcover1)
+```
+
+![](README_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+
+``` r
+All_data_BO<- read.csv("C:/Users/surya/Downloads/SHERPA_dataset/Grassland_land_Eur_reg.csv")
+
+All_data_BO<- All_data_BO[,c(6,93)]
+
+Grasslandpart1<- merge( Grassland4, All_data_BO, by="POINTID")
+
+test<- merge(Grasslandpart1, Grassland1, by = "POINTID")
+
+test$Final_number<- test$Fcover_number-test$Part1_number
+
+test<- test[!is.na(test$Final_number),]
+
+nrow(test)
+```
+
+    ## [1] 464
+
+``` r
+test<- read.csv("C:/Users/surya/Downloads/SHERPA_dataset/Datasets_Sherpa_11_feb/Grassland_part1_part2_464.csv")
+
+colnames(test)
+```
+
+    ##  [1] "POINTID"            "TH_LAT"             "TH_LONG"           
+    ##  [4] "Soil.erosion"       "Landslide"          "Zinc"              
+    ##  [7] "Antimony"           "Lead"               "Nickel"            
+    ## [10] "Mercury"            "Cobalt"             "Chromium"          
+    ## [13] "Copper"             "Cadmium"            "Arsenic"           
+    ## [16] "Salinity"           "Nitrogen.excess"    "Phophorus.excess"  
+    ## [19] "Pesticide.risk"     "Carbon.loss"        "Compaction"        
+    ## [22] "Part1"              "Part2"              "Final_SHERPA_score"
+    ## [25] "Class"
+
+``` r
+colnames(test)[which(colnames(test)%in% c("Class"))]<- "Class1"
+
+test<- merge(test, All_data_BO, by = "POINTID")
+
+Part1_part2_grassland <- test %>%
+  mutate(Class = as.character(Class))  # Convert Class to character if needed
+# Compute mean based on Class
+Part1_part2_grassland_avg <- Part1_part2_grassland %>%
+  group_by(Class) %>%
+  summarise(across(where(is.numeric), ~mean(.x, na.rm = TRUE)))
+
+# Load necessary library
+
+
+# Specify the desired order of variables
+variable_order <- c(
+  "Part2","Soil.erosion","Landslide", "Compaction", "Nitrogen.excess",
+  "Phophorus.excess", "Carbon.loss", "Pesticide.risk", "Salinity", "Zinc",
+  "Antimony", "Lead", "Nickel", "Mercury",
+  "Cobalt", "Chromium", "Copper", "Cadmium",
+  "Arsenic"
+)
+
+# Transform the data to long format and filter variables
+data_long <- Part1_part2_grassland_avg %>%
+  dplyr::select(all_of(c("Class", variable_order))) %>%  # Select required variables
+  pivot_longer(cols = -Class,
+               names_to = "Variable",
+               values_to = "Value") %>%
+  mutate(Variable = factor(Variable, levels = variable_order)) %>%  # Order variables
+  group_by(Class) %>%
+  arrange(Class, Variable) %>%  # Ensure correct order for cumulative calculation
+  mutate(Cumulative = if_else(Variable == "Part2", Value, NA_real_)) %>%  # Initialize Cumulative
+  mutate(Cumulative = replace(Cumulative, is.na(Cumulative),
+                              first(Cumulative, order_by = Variable) - cumsum(Value[Variable != "Part2"]))) %>%
+  ungroup()
+
+# Convert Class to a factor (ensures correct color mapping)
+test$Class <- as.factor(test$Class)
+data_long$Class <- as.factor(data_long$Class)
+
+# Define custom colors (Make sure these match actual class names)
+# Define custom colors based on the figure colors
+class_colors <- c("#7fbf4d","#d864a6","#ffbf33","#4a98c9") 
+
+# Histogram Plot
+ggplot(test, aes(x = Final_SHERPA_score, fill = Class)) +
+  geom_histogram(binwidth = 2, alpha = 0.6, position = "stack") +
+  labs(title = "Histogram of Final Score (Grassland)",
+       x = "Final SHERPA Score",
+       y = "Count") +
+  scale_fill_manual(values = class_colors) +  # Apply color mapping
+  theme_minimal(base_size = 16) +  
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 16, color = "black"),
+    axis.text.y = element_text(size = 16, color = "black"),
+    axis.title.x = element_text(size = 16, face = "bold"),
+    axis.title.y = element_text(size = 16, face = "bold"),
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    panel.grid.major = element_line(color = "gray80"),
+    panel.grid.minor = element_blank(),
+    legend.position = "top",
+    legend.title = element_text(size = 16, face = "bold"),
+    legend.text = element_text(size = 16)
+  )
+```
+
+![](README_files/figure-gfm/unnamed-chunk-5-2.png)<!-- -->
+
+``` r
+# Line Plot
+ggplot(data_long, aes(x = Variable, y = Cumulative, color = Class, group = Class)) +
+  geom_line(size = 1.2) +
+  geom_point(size = 3) +
+  scale_y_continuous(limits = c(-30, 10)) +
+  scale_color_manual(values = class_colors) +  # Apply color mapping
+  labs(
+    title = "Cumulative Reductions (Grassland)",
+    x = "Variable",
+    y = "Cumulative Reduction",
+    color = "Class"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 14, color = "black"),
+    axis.text.y = element_text(size = 14, color = "black"),
+    axis.title.x = element_text(size = 14, face = "bold"),
+    axis.title.y = element_text(size = 14, face = "bold"),
+    plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+    panel.grid.major = element_line(color = "gray80"),
+    panel.grid.minor = element_blank(),
+    legend.position = "top",
+    legend.title = element_text(size = 14, face = "bold"),
+    legend.text = element_text(size = 14)
+  )
+```
+
+![](README_files/figure-gfm/unnamed-chunk-5-3.png)<!-- -->
