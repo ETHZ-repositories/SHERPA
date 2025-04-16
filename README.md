@@ -8,11 +8,14 @@ Dise, Panos Panagos, Pasquale Borrelli
 
 - [Grassland (Part1)](#grassland-part1)
 - [Cropland (Part1)](#cropland-part1)
+- [Forest (Part1)](#forest-part1)
 
 We introduce SHERPA (Soil Health Evaluation, Rating Protocol, and
 Assessment) as a framework and present a first assessment across Europe.
 
 LUCAS data [link](https://esdac.jrc.ec.europa.eu/projects/lucas)
+
+ICP forest data [link](http://icp-forests.net/page/data-requests)
 
 ``` r
 ##Load the libraries
@@ -1005,6 +1008,292 @@ p <- ggplot(All_data_BO, aes(x = factor(Class, level = level_order), y = Part1_n
 print(p)
 ```
 
-    ## Warning: Removed 2 rows containing non-finite values (`stat_boxplot()`).
-
 ![](README_files/figure-gfm/unnamed-chunk-3-2.png)<!-- -->
+
+## Forest (Part1)
+
+``` r
+Forest_data<- read.dbf("C:/Users/surya/Downloads/SHERPA_dataset/Datasets_Sherpa_11_feb/Forest/Forest_data_13_feb.dbf")
+
+Forest_data<-Forest_data %>% mutate(Soil_erosion_number =
+                                    case_when(Soil_erosi == -9999 ~ NA_real_,
+                                      Soil_erosi>= 0 &  Soil_erosi<=0.5 ~ 0, 
+                                              Soil_erosi> 0.5 &  Soil_erosi<=1~ 1,
+                                              Soil_erosi> 1 &  Soil_erosi<=2 ~ 2,
+                                              Soil_erosi> 2 &  Soil_erosi<=3 ~ 3,
+                                              Soil_erosi> 3 &  Soil_erosi<=4 ~ 4,
+                                              Soil_erosi> 4 &  Soil_erosi<=5 ~ 5,
+                                              Soil_erosi> 5 &  Soil_erosi<=6 ~ 6,
+                                              Soil_erosi> 6 &  Soil_erosi<=8 ~ 7,
+                                              Soil_erosi> 8 &  Soil_erosi<=10 ~ 8,
+                                              Soil_erosi> 10 ~ 9
+                                    )
+)
+#########################################Landslide
+
+Forest_data<-Forest_data %>% mutate(LS_number =
+                                    case_when(LS==1 ~ 6, 
+                                              LS==2 ~ 1,
+                                              LS==3 ~ 4,
+                                              LS== -9999 ~ 0
+                                    )
+)
+
+
+#######################Heavy metals
+
+Forest_data<-Forest_data %>% mutate(Zinc_number =
+                                    case_when(Zn == -9999 ~ NA_real_,
+                                      Zn>= 0 &  Zn<=33 ~ 0, 
+                                              Zn> 33 &  Zn<=57~ 1,
+                                              Zn> 57 &  Zn<=81 ~ 2,
+                                              Zn> 81 &  Zn<=105 ~ 3,
+                                              Zn> 105 &  Zn<=129 ~ 4,
+                                              Zn> 129 &  Zn<=153 ~ 5,
+                                              Zn> 153 &  Zn<=177 ~ 6,
+                                              Zn> 177 &  Zn<=201 ~ 7,
+                                              Zn> 201 &  Zn<=225 ~ 8,
+                                              Zn> 225 ~ 9
+                                    )
+)
+
+Forest_data<-Forest_data %>% mutate(Antimony_number =
+                                    case_when(Antimony == -9999 ~ NA_real_,
+                                      Antimony>= 0 &  Antimony<=0.80 ~ 0, 
+                                              Antimony> 0.80 &  Antimony<=1.30 ~ 1,
+                                              Antimony> 1.30 &  Antimony<=1.80~ 2,
+                                              Antimony> 1.80 &  Antimony<=2.30 ~ 3,
+                                              Antimony> 2.30 &  Antimony<=2.80 ~ 4,
+                                              Antimony> 2.80 &  Antimony<=3.20 ~ 5,
+                                              Antimony> 3.20 &  Antimony<=3.80 ~ 6,
+                                              Antimony> 3.80 &  Antimony<=4.30 ~ 7,
+                                              Antimony> 4.30 &  Antimony<=5.00 ~ 8,
+                                              Antimony> 5 ~ 9
+                                    )
+)
+
+Forest_data<-Forest_data %>% mutate(Lead_number =
+                                    case_when(Lead == -9999 ~ NA_real_,
+                                      Lead>= 0 &  Lead<=23 ~ 0, 
+                                              Lead> 23 &  Lead<=42 ~ 1,
+                                              Lead> 42 &  Lead<=61~ 2,
+                                              Lead> 61 &  Lead<=80 ~ 3,
+                                              Lead> 80 &  Lead<=99 ~ 4,
+                                              Lead> 99 &  Lead<=118 ~ 5,
+                                              Lead> 118 &  Lead<=137 ~ 6,
+                                              Lead> 137 &  Lead<=156 ~ 7,
+                                              Lead> 156 &  Lead<=175 ~ 8,
+                                              Lead> 175 ~ 9
+                                    )
+)
+
+Forest_data<-Forest_data %>% mutate(Nickel_number =
+                                    case_when(Nickel == -9999 ~ NA_real_,
+                                      Nickel>= 0 &  Nickel<=9 ~ 0, 
+                                              Nickel> 9 &  Nickel<=14 ~ 1,
+                                              Nickel> 14 & Nickel<=20~ 2,
+                                              Nickel> 20 &  Nickel<=25 ~ 3,
+                                              Nickel> 25 &  Nickel<=31 ~ 4,
+                                              Nickel> 31 &  Nickel<=36 ~ 5,
+                                              Nickel> 36 &  Nickel<=42 ~ 6,
+                                              Nickel> 42 &  Nickel<=47 ~ 7,
+                                              Nickel> 47 &  Nickel<=53 ~ 8,
+                                              Nickel> 53 ~ 9
+                                    )
+)
+
+Forest_data<-Forest_data %>% mutate(Mercury_number =
+                                    case_when(Mercury == -9999 ~ NA_real_,
+                                      Mercury>= 0 &  Mercury<=23 ~ 0, 
+                                              Mercury> 23 &  Mercury<=179 ~ 1,
+                                              Mercury> 179 & Mercury<=332~ 2,
+                                              Mercury> 332 &  Mercury<=485 ~ 3,
+                                              Mercury> 485 &  Mercury<=638 ~ 4,
+                                              Mercury> 638 &  Mercury<=791 ~ 5,
+                                              Mercury> 791 &  Mercury<=944 ~ 6,
+                                              Mercury> 944 &  Mercury<=1097 ~ 7,
+                                              Mercury> 1097 &  Mercury<=1250 ~ 8,
+                                              Mercury> 1250 ~ 9
+                                    )
+)
+
+Forest_data<-Forest_data %>% mutate(Cobalt_number =
+                                    case_when(Cobalt == -9999 ~ NA_real_,
+                                      Cobalt>= 0 &  Cobalt<=20 ~ 0, 
+                                              Cobalt> 20 &  Cobalt<=25 ~ 1,
+                                              Cobalt> 25 & Cobalt<=30~ 2,
+                                              Cobalt> 30 &  Cobalt<=35 ~ 3,
+                                              Cobalt> 35 &  Cobalt<=40 ~ 4,
+                                              Cobalt> 40 &  Cobalt<=45 ~ 5,
+                                              Cobalt> 45 &  Cobalt<=50 ~ 6,
+                                              Cobalt> 50 &  Cobalt<=55 ~ 7,
+                                              Cobalt> 55 &  Cobalt<=60 ~ 8,
+                                              Cobalt> 60 ~ 9
+                                    )
+)
+
+
+Forest_data<-Forest_data %>% mutate(Chromium_number =
+                                    case_when(Chromium == -9999 ~ NA_real_,
+                                      Chromium>= 0 &  Chromium<=70 ~ 0, 
+                                              Chromium> 70 &  Chromium<=25 ~ 1,
+                                              Chromium> 90 & Chromium<=30~ 2,
+                                              Chromium> 110 &  Chromium<=35 ~ 3,
+                                              Chromium> 130 &  Chromium<=40 ~ 4,
+                                              Chromium> 155 &  Chromium<=45 ~ 5,
+                                              Chromium> 180 &  Chromium<=50 ~ 6,
+                                              Chromium> 205 &  Chromium<=55 ~ 7,
+                                              Chromium> 230 &  Chromium<=60 ~ 8,
+                                              Chromium> 250 ~ 9
+                                    )
+)
+
+Forest_data<-Forest_data %>% mutate(Copper_number =
+                                    case_when(Copper == -9999 ~ NA_real_,
+                                      Copper>= 0 &  Copper<=22 ~ 0, 
+                                              Copper> 22 &  Copper<=32 ~ 1,
+                                              Copper> 32 & Copper<=41~ 2,
+                                              Copper> 41 &  Copper<=50 ~ 3,
+                                              Copper> 50 &  Copper<=59 ~ 4,
+                                              Copper> 59 &  Copper<=68 ~ 5,
+                                              Copper> 68 &  Copper<=77 ~ 6,
+                                              Copper> 77 &  Copper<=86 ~ 7,
+                                              Copper> 86 &  Copper<=95 ~ 8,
+                                              Copper> 95 ~ 9
+                                    )
+)
+
+Forest_data<-Forest_data %>% mutate(Cadmium_number =
+                                    case_when(Cadmium == -9999 ~ NA_real_,
+                                      Cadmium>= 0 &  Cadmium<=0.5 ~ 0, 
+                                              Cadmium> 0.5 &  Cadmium<=0.6 ~ 1,
+                                              Cadmium> 0.6 & Cadmium<=0.8~ 2,
+                                              Cadmium> 0.8 &  Cadmium<=1.0 ~ 3,
+                                              Cadmium> 1.0 &  Cadmium<=1.2 ~ 4,
+                                              Cadmium> 1.2 &  Cadmium<=1.4 ~ 5,
+                                              Cadmium> 1.4 &  Cadmium<=1.6 ~ 6,
+                                              Cadmium> 1.6 &  Cadmium<=1.8 ~ 7,
+                                              Cadmium> 1.8 &  Cadmium<=2.0 ~ 8,
+                                              Cadmium> 2.0 ~ 9
+                                    )
+)
+
+Forest_data<-Forest_data %>% mutate(Arsenic_number =
+                                    case_when(LUCAS_medi == -9999 ~ NA_real_,
+                                      LUCAS_medi>= 0 &  LUCAS_medi<=10 ~ 0, 
+                                              LUCAS_medi> 10 &  LUCAS_medi<=30 ~ 1,
+                                              LUCAS_medi> 30 & LUCAS_medi<=50~ 2,
+                                              LUCAS_medi> 50 &  LUCAS_medi<=70 ~ 3,
+                                              LUCAS_medi> 70 &  LUCAS_medi<=95 ~ 4,
+                                              LUCAS_medi> 95 &  LUCAS_medi<=120 ~ 5,
+                                              LUCAS_medi> 120 &  LUCAS_medi<=145 ~ 6,
+                                              LUCAS_medi> 145 &  LUCAS_medi<=175 ~ 7,
+                                              LUCAS_medi> 175 &  LUCAS_medi<=200 ~ 8,
+                                              LUCAS_medi> 200 ~ 9
+                                    )
+)
+
+colnames(Forest_data)
+```
+
+    ##  [1] "Field1"              "code23"              "code23_X"           
+    ##  [4] "code23_Y"            "ddlat"               "ddlong"             
+    ##  [7] "Elevation"           "Humus"               "descriptio"         
+    ## [10] "Parent_mat"          "RASTERVALU"          "Cadmium"            
+    ## [13] "Copper"              "Chromium"            "Cobalt"             
+    ## [16] "Mercury"             "Manganese"           "Nickel"             
+    ## [19] "Lead"                "Soil_erosi"          "Antimony"           
+    ## [22] "Zn"                  "LUCAS_medi"          "ndep_nhx15"         
+    ## [25] "Nsurplus1"           "LS"                  "Soil_erosion_number"
+    ## [28] "LS_number"           "Zinc_number"         "Antimony_number"    
+    ## [31] "Lead_number"         "Nickel_number"       "Mercury_number"     
+    ## [34] "Cobalt_number"       "Chromium_number"     "Copper_number"      
+    ## [37] "Cadmium_number"      "Arsenic_number"
+
+``` r
+colnames(Forest_data)[which(colnames(Forest_data)%in% c("Nsurplus1"))]<- "net_nitrogen"
+
+Forest_data<-Forest_data %>% mutate(Nitrogen_number =
+                                  case_when(net_nitrogen == -9999 ~ NA_real_,
+                                    net_nitrogen<2 ~ 0, 
+                                            net_nitrogen> 2 &  net_nitrogen<=3 ~ 1,
+                                            net_nitrogen> 3 & net_nitrogen<=4~ 2,
+                                            net_nitrogen>4 &  net_nitrogen<=5 ~ 3,
+                                            net_nitrogen> 5 &  net_nitrogen<=10 ~ 4,
+                                            net_nitrogen> 10 & net_nitrogen<=15 ~ 5,
+                                            net_nitrogen> 15 &  net_nitrogen<=20 ~ 6,
+                                            net_nitrogen> 20 &  net_nitrogen<=25 ~ 7,
+                                            net_nitrogen> 25 & net_nitrogen<=30 ~ 8,
+                                            net_nitrogen> 30 ~ 9
+                                  )
+)
+
+
+
+Forest_data$Part1_number<- Forest_data$Nitrogen_number+Forest_data$Arsenic_number+Forest_data$Cadmium_number+
+  Forest_data$Copper_number+Forest_data$Chromium_number+Forest_data$Cobalt_number+Forest_data$Mercury_number+Forest_data$Nickel_number+Forest_data$Lead_number+Forest_data$Antimony_number+
+  Forest_data$Zinc_number+Forest_data$Soil_erosion_number+Forest_data$LS_number
+
+Forest_data<- Forest_data[!is.na(Forest_data$Part1_number),]
+
+hist(Forest_data$Part1_number)
+```
+
+![](README_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+
+``` r
+All_data_BO<- read.csv("C:/Users/surya/Downloads/SHERPA_dataset/Forest_land_Eur_reg.csv")
+
+colnames(All_data_BO)
+```
+
+    ##  [1] "OBJECTID.." "Shape.."    "Join_Count" "TARGET_FID" "Field1"    
+    ##  [6] "Field1_1"   "code23"     "ddlat"      "ddlong"     "Elevation" 
+    ## [11] "Humus"      "descriptio" "Parent_mat" "RASTERVALU" "Cadmium"   
+    ## [16] "Copper"     "Chromium"   "Cobalt"     "Mercury"    "Manganese" 
+    ## [21] "Nickel"     "Lead"       "Soil_erosi" "Antimony"   "Zn"        
+    ## [26] "LUCAS_medi" "ndep_nhx15" "ndep_nhx16" "ndep_nhx17" "ndep_nhx18"
+    ## [31] "ndep_nhx19" "ndep_noy15" "ndep_noy16" "ndep_noy17" "ndep_noy18"
+    ## [36] "ndep_noy19" "Nsurplus1"  "globalarea" "ndep_nhx_2" "nitrogen_t"
+    ## [41] "net_nitrog" "mean_dep_n" "mean_dep_1" "Soil_ero_1" "Zinc_numbe"
+    ## [46] "Antimony_n" "Lead_numbe" "Nickel_num" "Mercury_nu" "Cobalt_num"
+    ## [51] "Chromium_n" "Copper_num" "Cadmium_nu" "Arsenic_nu" "Nitrogen_n"
+    ## [56] "Part1_numb" "Code"       "Shape_Leng" "Class"      "NewField"  
+    ## [61] "NewField.1"
+
+``` r
+All_data_BO<- All_data_BO[,c(7,59)]
+
+All_data_BO<- merge(Forest_data, All_data_BO, by = "code23")
+
+level_order <- c('Northern', 'Western', 'Cent_Eastern', 'Southern') 
+
+my_colors <- c(
+  "Northern" = "#0000FF", # Orange
+  "Western" = "#800080", # Blue
+  "Cent_Eastern" = "#FF0000", # Green
+  "Southern" = "#90EE90"  # Yellow
+)
+
+p <- ggplot(All_data_BO, aes(x = factor(Class, level = level_order), y = Part1_number, fill = Class)) + 
+  geom_boxplot(outlier.shape = NA, width = 0.6, alpha = 0.7, position = position_dodge(width = 0.75)) +  # Separate boxplots
+  # Separate points
+  labs(x = "European region [-]",
+       y = "Part1_Number [-]") +  # Add title
+  theme_minimal(base_size = 15) +  # Clean background
+  theme(
+    axis.text = element_text(size = 18),
+    axis.title = element_text(size = 20, face = "bold"),
+    plot.title = element_text(size = 22, face = "bold", hjust = 0.5),  # Centered title
+    legend.position = "bottom",
+    legend.text = element_text(size = 18),
+    legend.title = element_text(size = 18)
+  ) +
+  scale_y_continuous(limits = c(0, 50), expand = c(0, 0)) +  # Set limits and remove extra space
+  scale_fill_manual(values = my_colors) +  # Apply custom colors to fill
+  scale_color_manual(values = my_colors)  # Apply custom colors to points
+
+print(p)
+```
+
+![](README_files/figure-gfm/unnamed-chunk-4-2.png)<!-- -->
