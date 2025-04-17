@@ -18,6 +18,9 @@ LUCAS data [link](https://esdac.jrc.ec.europa.eu/projects/lucas)
 
 ICP forest data [link](http://icp-forests.net/page/data-requests)
 
+The maps used for part1 and part2 can be found here
+[link](https://drive.google.com/file/d/1gzNBtUkDcRYhXqcw_QYlVQr2B_8QHRfw/view?usp=sharing)
+
 ``` r
 ##Load the libraries
 
