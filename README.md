@@ -6,11 +6,12 @@ Antonia Kaiser,Nima Shokri, Simon Scheper, Miriam Gross-Schmölders,
 David Robinson, GrantCampbell, Cezary Kabala, Friederike Lang, Nancy
 Dise, Panos Panagos, Pasquale Borrelli
 
-- [Grassland (Part1)](#grassland-part1)
 - [Cropland (Part1)](#cropland-part1)
-- [Forest (Part1)](#forest-part1)
-- [Grassland (Part2)](#grassland-part2)
 - [Cropland (Part2)](#cropland-part2)
+- [Grassland (Part1)](#grassland-part1)
+- [Grassland (Part2)](#grassland-part2)
+- [Forest (Part1)](#forest-part1)
+- [Forest (Part2)](#forest-part2)
 
 We introduce SHERPA (Soil Health Evaluation, Rating Protocol, and
 Assessment) as a framework and present a first assessment across Europe.
@@ -267,386 +268,6 @@ Grassland<- LUCAS_final[LUCAS_final$LC0_Desc=="Grassland",]
 
 Forestland<- LUCAS_final[LUCAS_final$LC0_Desc=="Woodland",]
 ```
-
-## Grassland (Part1)
-
-``` r
-Grassland2<- Grassland[,c(1:52, 78:95)]
-
-Grassland2$Net_phophorus<- (Grassland2$Miniral_P_input+Grassland2$Organic_P_input)
- 
-Grassland2$EC<- Grassland2$EC/100
-
-Grassland4<- Grassland2[!is.na(Grassland2$Net_phophorus),]
- 
-## the new file is loaded because the current dataset was missing the carbon stock, Bulk density, land slide density,
-## Risk score, Active ingredient, and soil texture class 
-
-##read grassland_data
-Grassland5<- read.dbf("C:/Users/surya/Downloads/SHERPA_dataset/Datasets_Sherpa_11_feb/Grassland_data.dbf")
-
-Grassland5<- Grassland5[,c(2,72:77)]
-
-Grassland4<- merge(Grassland4, Grassland5, by = "POINTID")
-
-############Soil texture
-
-Grassland4 <- Grassland4 %>% 
-  mutate(Soil_tex_class = case_when(
-    textureUSD == -9999 ~ NA_character_,  # Change to NA_character_
-    textureUSD == 1 ~ "Clay", 
-    textureUSD == 2 ~ "Silty Clay",
-    textureUSD == 3 ~ "Silty Clay Loam",
-    textureUSD == 4 ~ "Sandy Clay",
-    textureUSD == 5 ~ "Sandy Clay Loam",
-    textureUSD == 6 ~ "Clay Loam",
-    textureUSD == 7 ~ "Silt",
-    textureUSD == 8 ~ "Silt Loam",
-    textureUSD == 9 ~ "Loam",
-    textureUSD == 10 ~ "Sand",
-    textureUSD == 11 ~ "Loamy Sand",
-    textureUSD == 12 ~ "Sandy Loam"
-  ))
-
-############Soil erosion
-
-Grassland4<-Grassland4 %>% mutate(Soil_erosion_number =
-                              case_when(Soil_erosion == -9999 ~ NA_real_,
-                                Soil_erosion>= 0 &  Soil_erosion<=0.5 ~ 0, 
-                                        Soil_erosion> 0.5 &  Soil_erosion<=1~ 1,
-                                        Soil_erosion> 1 &  Soil_erosion<=2 ~ 2,
-                                        Soil_erosion> 2 &  Soil_erosion<=3 ~ 3,
-                                        Soil_erosion> 3 &  Soil_erosion<=4 ~ 4,
-                                        Soil_erosion> 4 &  Soil_erosion<=5 ~ 5,
-                                        Soil_erosion> 5 &  Soil_erosion<=6 ~ 6,
-                                        Soil_erosion> 6 &  Soil_erosion<=8 ~ 7,
-                                        Soil_erosion> 8 &  Soil_erosion<=10 ~ 8,
-                                        Soil_erosion> 10 ~ 9
-                              )
-)
-
-###########################landslide density
-
-Grassland4<-Grassland4 %>% mutate(LS_number =
-                                    case_when(LS==1 ~ 6, 
-                                              LS==2 ~ 1,
-                                              LS==3 ~ 4,
-                                              LS== -9999 ~ 0
-                                    )
-)
-
-
-#######################Heavy metals
-
-Grassland4<-Grassland4 %>% mutate(Zinc_number =
-                                    case_when(Zinc == -9999 ~ NA_real_,
-                                      Zinc>= 0 &  Zinc<=33 ~ 0, 
-                                              Zinc> 33 &  Zinc<=57~ 1,
-                                              Zinc> 57 &  Zinc<=81 ~ 2,
-                                              Zinc> 81 &  Zinc<=105 ~ 3,
-                                              Zinc> 105 &  Zinc<=129 ~ 4,
-                                              Zinc> 129 &  Zinc<=153 ~ 5,
-                                              Zinc> 153 &  Zinc<=177 ~ 6,
-                                              Zinc> 177 &  Zinc<=201 ~ 7,
-                                              Zinc> 201 &  Zinc<=225 ~ 8,
-                                              Zinc> 225 ~ 9
-                                    )
-)
-
-Grassland4<-Grassland4 %>% mutate(Antimony_number =
-                                    case_when(Antimony == -9999 ~ NA_real_,
-                                      Antimony>= 0 &  Antimony<=0.80 ~ 0, 
-                                              Antimony> 0.80 &  Antimony<=1.30 ~ 1,
-                                              Antimony> 1.30 &  Antimony<=1.80~ 2,
-                                              Antimony> 1.80 &  Antimony<=2.30 ~ 3,
-                                              Antimony> 2.30 &  Antimony<=2.80 ~ 4,
-                                              Antimony> 2.80 &  Antimony<=3.20 ~ 5,
-                                              Antimony> 3.20 &  Antimony<=3.80 ~ 6,
-                                              Antimony> 3.80 &  Antimony<=4.30 ~ 7,
-                                              Antimony> 4.30 &  Antimony<=5.00 ~ 8,
-                                              Antimony> 5 ~ 9
-                                    )
-)
-
-Grassland4<-Grassland4 %>% mutate(Lead_number =
-                                    case_when(Lead == -9999 ~ NA_real_,
-                                      Lead>= 0 &  Lead<=23 ~ 0, 
-                                              Lead> 23 &  Lead<=42 ~ 1,
-                                              Lead> 42 &  Lead<=61~ 2,
-                                              Lead> 61 &  Lead<=80 ~ 3,
-                                              Lead> 80 &  Lead<=99 ~ 4,
-                                              Lead> 99 &  Lead<=118 ~ 5,
-                                              Lead> 118 &  Lead<=137 ~ 6,
-                                              Lead> 137 &  Lead<=156 ~ 7,
-                                              Lead> 156 &  Lead<=175 ~ 8,
-                                              Lead> 175 ~ 9
-                                    )
-)
-
-Grassland4<-Grassland4 %>% mutate(Nickel_number =
-                                    case_when(Nickel == -9999 ~ NA_real_,
-                                      Nickel>= 0 &  Nickel<=9 ~ 0, 
-                                              Nickel> 9 &  Nickel<=14 ~ 1,
-                                              Nickel> 14 & Nickel<=20~ 2,
-                                              Nickel> 20 &  Nickel<=25 ~ 3,
-                                              Nickel> 25 &  Nickel<=31 ~ 4,
-                                              Nickel> 31 &  Nickel<=36 ~ 5,
-                                              Nickel> 36 &  Nickel<=42 ~ 6,
-                                              Nickel> 42 &  Nickel<=47 ~ 7,
-                                              Nickel> 47 &  Nickel<=53 ~ 8,
-                                              Nickel> 53 ~ 9
-                                    )
-)
-
-Grassland4<-Grassland4 %>% mutate(Mercury_number =
-                                    case_when(Mercury == -9999 ~ NA_real_,
-                                      Mercury>= 0 &  Mercury<=23 ~ 0, 
-                                              Mercury> 23 &  Mercury<=179 ~ 1,
-                                              Mercury> 179 & Mercury<=332~ 2,
-                                              Mercury> 332 &  Mercury<=485 ~ 3,
-                                              Mercury> 485 &  Mercury<=638 ~ 4,
-                                              Mercury> 638 &  Mercury<=791 ~ 5,
-                                              Mercury> 791 &  Mercury<=944 ~ 6,
-                                              Mercury> 944 &  Mercury<=1097 ~ 7,
-                                              Mercury> 1097 &  Mercury<=1250 ~ 8,
-                                              Mercury> 1250 ~ 9
-                                    )
-)
-
-Grassland4<-Grassland4 %>% mutate(Cobalt_number =
-                                    case_when(Cobalt == -9999 ~ NA_real_,
-                                      Cobalt>= 0 &  Cobalt<=20 ~ 0, 
-                                              Cobalt> 20 &  Cobalt<=25 ~ 1,
-                                              Cobalt> 25 & Cobalt<=30~ 2,
-                                              Cobalt> 30 &  Cobalt<=35 ~ 3,
-                                              Cobalt> 35 &  Cobalt<=40 ~ 4,
-                                              Cobalt> 40 &  Cobalt<=45 ~ 5,
-                                              Cobalt> 45 &  Cobalt<=50 ~ 6,
-                                              Cobalt> 50 &  Cobalt<=55 ~ 7,
-                                              Cobalt> 55 &  Cobalt<=60 ~ 8,
-                                              Cobalt> 60 ~ 9
-                                    )
-)
-
-
-Grassland4<-Grassland4 %>% mutate(Chromium_number =
-                                    case_when(Chromium == -9999 ~ NA_real_,
-                                      Chromium>= 0 &  Chromium<=70 ~ 0, 
-                                              Chromium> 70 &  Chromium<=25 ~ 1,
-                                              Chromium> 90 & Chromium<=30~ 2,
-                                              Chromium> 110 &  Chromium<=35 ~ 3,
-                                              Chromium> 130 &  Chromium<=40 ~ 4,
-                                              Chromium> 155 &  Chromium<=45 ~ 5,
-                                              Chromium> 180 &  Chromium<=50 ~ 6,
-                                              Chromium> 205 &  Chromium<=55 ~ 7,
-                                              Chromium> 230 &  Chromium<=60 ~ 8,
-                                              Chromium> 250 ~ 9
-                                    )
-)
-
-Grassland4<-Grassland4 %>% mutate(Copper_number =
-                                    case_when(Copper == -9999 ~ NA_real_,
-                                      Copper>= 0 &  Copper<=22 ~ 0, 
-                                              Copper> 22 &  Copper<=32 ~ 1,
-                                              Copper> 32 & Copper<=41~ 2,
-                                              Copper> 41 &  Copper<=50 ~ 3,
-                                              Copper> 50 &  Copper<=59 ~ 4,
-                                              Copper> 59 &  Copper<=68 ~ 5,
-                                              Copper> 68 &  Copper<=77 ~ 6,
-                                              Copper> 77 &  Copper<=86 ~ 7,
-                                              Copper> 86 &  Copper<=95 ~ 8,
-                                              Copper> 95 ~ 9
-                                    )
-)
-
-Grassland4<-Grassland4 %>% mutate(Cadmium_number =
-                                    case_when(Cadmium == -9999 ~ NA_real_,
-                                      Cadmium>= 0 &  Cadmium<=0.5 ~ 0, 
-                                              Cadmium> 0.5 &  Cadmium<=0.6 ~ 1,
-                                              Cadmium> 0.6 & Cadmium<=0.8~ 2,
-                                              Cadmium> 0.8 &  Cadmium<=1.0 ~ 3,
-                                              Cadmium> 1.0 &  Cadmium<=1.2 ~ 4,
-                                              Cadmium> 1.2 &  Cadmium<=1.4 ~ 5,
-                                              Cadmium> 1.4 &  Cadmium<=1.6 ~ 6,
-                                              Cadmium> 1.6 &  Cadmium<=1.8 ~ 7,
-                                              Cadmium> 1.8 &  Cadmium<=2.0 ~ 8,
-                                              Cadmium> 2.0 ~ 9
-                                    )
-)
-
-Grassland4<-Grassland4 %>% mutate(Arsenic_number =
-                                    case_when(Arsenic == -9999 ~ NA_real_,
-                                      Arsenic>= 0 &  Arsenic<=10 ~ 0, 
-                                              Arsenic> 10 &  Arsenic<=30 ~ 1,
-                                              Arsenic> 30 & Arsenic<=50~ 2,
-                                              Arsenic> 50 &  Arsenic<=70 ~ 3,
-                                              Arsenic> 70 &  Arsenic<=95 ~ 4,
-                                              Arsenic> 95 &  Arsenic<=120 ~ 5,
-                                              Arsenic> 120 &  Arsenic<=145 ~ 6,
-                                              Arsenic> 145 &  Arsenic<=175 ~ 7,
-                                              Arsenic> 175 &  Arsenic<=200 ~ 8,
-                                              Arsenic> 200 ~ 9
-                                    )
-)
-
-
-
-########################EC
-
-Grassland4<-Grassland4 %>% mutate(EC_number =
-                                    case_when(EC == -9999 ~ NA_real_,
-                                      EC>= 0 &  EC<=2 ~ 0, 
-                                              EC> 2 &  EC<=2.2 ~ 1,
-                                              EC> 2.2 & EC<=2.4~ 2,
-                                              EC> 2.4 &  EC<=2.6 ~ 3,
-                                              EC> 2.6 &  EC<=2.9 ~ 4,
-                                              EC> 2.9 &  EC<=3.1 ~ 5,
-                                              EC> 3.1 &  EC<=3.4 ~ 6,
-                                              EC> 3.4 &  EC<=3.7 ~ 7,
-                                              EC> 3.7 &  EC<=4 ~ 8,
-                                              EC> 4 ~ 9
-                                    )
-)
-
-Grassland4<-Grassland4 %>% mutate(Nitrogen_number =
-                                    case_when(Nitrogen_Surplus == -9999 ~ NA_real_,
-                                      Nitrogen_Surplus<2 ~ 0, 
-                                              Nitrogen_Surplus> 2 &  Nitrogen_Surplus<=3 ~ 1,
-                                              Nitrogen_Surplus> 3 & Nitrogen_Surplus<=4~ 2,
-                                              Nitrogen_Surplus>4 &  Nitrogen_Surplus<=5 ~ 3,
-                                              Nitrogen_Surplus> 5 &  Nitrogen_Surplus<=10 ~ 4,
-                                              Nitrogen_Surplus> 10 & Nitrogen_Surplus<=15 ~ 5,
-                                              Nitrogen_Surplus> 15 &  Nitrogen_Surplus<=20 ~ 6,
-                                              Nitrogen_Surplus> 20 &  Nitrogen_Surplus<=25 ~ 7,
-                                              Nitrogen_Surplus> 25 & Nitrogen_Surplus<=30 ~ 8,
-                                              Nitrogen_Surplus> 30 ~ 9
-                                    )
-)
-
-##########################Phosphorus
-
-Grassland4<-Grassland4 %>% mutate(Phophorus_number_excess =
-                                    case_when(Net_phophorus == -9999 ~ NA_real_,
-                                      Net_phophorus>= 0 &  Net_phophorus<=1 ~ 0, 
-                                              Net_phophorus> 1 &  Net_phophorus<=2 ~ 1,
-                                              Net_phophorus> 2 & Net_phophorus<=3~ 2,
-                                              Net_phophorus> 3 &  Net_phophorus<=4 ~ 3,
-                                              Net_phophorus> 4 &  Net_phophorus<=5 ~ 4,
-                                              Net_phophorus> 5 & Net_phophorus<=6 ~ 5,
-                                              Net_phophorus> 6 &  Net_phophorus<=7 ~ 6,
-                                              Net_phophorus> 7 &  Net_phophorus<=8 ~ 7,
-                                              Net_phophorus> 8 & Net_phophorus<=9 ~ 8,
-                                              Net_phophorus> 9 ~ 9
-                                    )
-)
-
-######################################Pesticide
-
-Grassland4 <- Grassland4 %>%
-  mutate(Pesticide_Risk_Score = case_when(
-    RS <= 0 & AI == 0 ~ 0,  # Negligible risk, no active ingredient
-    RS <= 0 & AI >= 0 ~ 1, 
-    RS > 0 & RS <= 1 & AI >= 0 & AI <= 10 ~ 2,# Negligible risk, some active ingredient
-    RS > 1 & RS <= 2 & AI > 1 & AI <= 10 ~ 3,  # Medium-low risk, AI between 1-10
-    RS > 1 & RS <= 2 & AI > 10 & AI <= 20 ~ 4, # Medium-low risk, AI between 10-20
-    RS > 2 & RS <= 3 & AI > 1 & AI <= 10 ~ 5,  # Medium risk, AI between 1-10
-    RS > 2 & RS <= 3 & AI > 10 & AI <= 20 ~ 6, # Medium risk, AI between 10-20
-    RS > 3 & RS <= 4 & AI > 1 & AI <= 10 ~ 7,  # High risk, AI between 1-10
-    RS > 3 & RS <= 4 & AI > 10 & AI <= 20 ~ 8, # High risk, AI between 10-20
-    RS > 4 & AI > 10 ~ 9,  # Very high risk, AI greater than 10
-    TRUE ~ NA_real_  # Assign NA for unclassified cases
-  ))
-
-###################################SOC loss
-
-Grassland4 <- Grassland4 %>% 
-  mutate(C_loss_score = case_when(
-    Stock_carb == -9999 ~ NA_real_,                    # If value is -9999, assign NA
-    Stock_carb >= 0 ~ 0,                                # 0 to positive (e.g., SOC accumulation)
-    Stock_carb > -0.5 & Stock_carb <= 0 ~ 1,            # < 0 to -0.5
-    Stock_carb > -1.5 & Stock_carb <= -0.5 ~ 2,         # < -0.5 to -1.5
-    Stock_carb > -3 & Stock_carb <= -1.5 ~ 3,           # < -1.5 to -3
-    Stock_carb > -4 & Stock_carb <= -3 ~ 4,             # < -3 to -4
-    Stock_carb > -5 & Stock_carb <= -4 ~ 5,             # < -4 to -5
-    Stock_carb > -6 & Stock_carb <= -5 ~ 6,             # < -5 to -6
-    Stock_carb > -7 & Stock_carb <= -6 ~ 7,             # < -6 to -7
-    Stock_carb > -8 & Stock_carb <= -7 ~ 8,             # < -7 to -8
-    Stock_carb < -8 ~ 9                                # < -8
-  ))
-
-
-
-#########################################compaction
-
-Grassland4 <- Grassland4 %>%
-  mutate(BD = ifelse(BD == -9999, NA, BD)) %>%  # Convert BD -9999 to NA
-  mutate(Soil_bulk_density_score = case_when(
-    Soil_tex_class == -9999 ~ NA_real_,
-    Soil_tex_class == "Clay" ~ ifelse(BD < 1.10, 0, ifelse(BD >= 1.10 & BD <= 1.47, 3, 9)),   
-    Soil_tex_class == "Clay Loam" ~ ifelse(BD < 1.40, 0, ifelse(BD >= 1.40 & BD <= 1.75, 3, 9)),   
-    Soil_tex_class == "Loam" ~ ifelse(BD < 1.40, 0, ifelse(BD >= 1.40 & BD <= 1.80, 3, 9)),   
-    Soil_tex_class == "Loamy Sand" ~ ifelse(BD < 1.60, 0, ifelse(BD >= 1.60 & BD <= 1.80, 3, 9)),  
-    Soil_tex_class == "Sand" ~ ifelse(BD < 1.60, 0, ifelse(BD >= 1.60 & BD <= 1.80, 3, 9)),   
-    Soil_tex_class == "Sandy Clay Loam" ~ ifelse(BD < 1.40, 0, ifelse(BD >= 1.40 & BD <= 1.75, 3, 9)),   
-    Soil_tex_class == "Sandy Loam" ~ ifelse(BD < 1.40, 0, ifelse(BD >= 1.40 & BD <= 1.80, 3, 9)),   
-    Soil_tex_class == "Silt Loam" ~ ifelse(BD < 1.40, 0, ifelse(BD >= 1.40 & BD <= 1.65, 3, 9)),   
-    Soil_tex_class == "Silty Clay" ~ ifelse(BD < 1.10, 0, ifelse(BD >= 1.10 & BD <= 1.58, 3, 9)),   
-    Soil_tex_class == "Silty Clay Loam" ~ ifelse(BD < 1.40, 0, ifelse(BD >= 1.40 & BD <= 1.65, 3, 9)),   
-    TRUE ~ NA_real_  # Assign NA for unrecognized texture names
-  ))
-
-########################################################
-
- Grassland4$Part1_number<- Grassland4$Phophorus_number+Grassland4$Nitrogen_number+Grassland4$EC_number+Grassland4$Arsenic_number+Grassland4$Cadmium_number+
-   Grassland4$Copper_number+Grassland4$Chromium_number+Grassland4$Cobalt_number+Grassland4$Mercury_number+Grassland4$Nickel_number+Grassland4$Lead_number+Grassland4$Antimony_number+
-  Grassland4$Zinc_number+Grassland4$Soil_erosion_number+Grassland4$Soil_bulk_density_score+Grassland4$C_loss_score+Grassland4$Pesticide_Risk_Score+
-   Grassland4$LS_number
-
-Grassland4<- Grassland4[!is.na(Grassland4$Part1_number),]
-
-hist(Grassland4$Part1_number)
-```
-
-![](README_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
-
-``` r
-## Regional variability in Part1 scores across Europe
-
-All_data_BO<- read.csv("C:/Users/surya/Downloads/SHERPA_dataset/Grassland_land_Eur_reg.csv")
-
-All_data_BO<- All_data_BO[,c(6,93)]
-
-All_data_BO<- merge(Grassland4, All_data_BO, by = "POINTID")
-
-level_order <- c('Northern', 'Western', 'Cent_Eastern', 'Southern') 
-
-my_colors <- c(
-  "Northern" = "#0000FF", # Orange
-  "Western" = "#800080", # Blue
-  "Cent_Eastern" = "#FF0000", # Green
-  "Southern" = "#90EE90"  # Yellow
-)
-p <- ggplot(All_data_BO, aes(x = factor(Class, level = level_order), y = Part1_number, fill = Class)) + 
-  geom_boxplot(outlier.shape = NA, width = 0.6, alpha = 0.7, position = position_dodge(width = 0.75)) +  
-  labs(x = "European region [-]",
-       y = "Part1_Number [-]") +  
-  theme_minimal(base_size = 15) +  
-  theme(
-    axis.text = element_text(size = 18),
-    axis.title = element_text(size = 20, face = "bold"),
-    plot.title = element_text(size = 22, face = "bold", hjust = 0.5),  
-    legend.position = "bottom",
-    legend.text = element_text(size = 18),
-    legend.title = element_text(size = 18)
-  ) +
-  scale_y_continuous(limits = c(0, 50), expand = c(0, 0)) +  
-  scale_fill_manual(values = my_colors) +  
-  scale_color_manual(values = my_colors)  
-
-print(p)
-```
-
-![](README_files/figure-gfm/unnamed-chunk-2-2.png)<!-- -->
 
 ## Cropland (Part1)
 
@@ -999,7 +620,7 @@ Cropland4<- Cropland4[!is.na(Cropland4$Part1_number),]
 hist(Cropland4$Part1_number)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
 
 ``` r
 ## Regional variability in Part1 scores across Europe
@@ -1040,30 +661,274 @@ p <- ggplot(All_data_BO, aes(x = factor(Class, level = level_order), y = Part1_n
 print(p)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-3-2.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-2-2.png)<!-- -->
 
-## Forest (Part1)
+## Cropland (Part2)
 
 ``` r
-Forest_data<- read.dbf("C:/Users/surya/Downloads/SHERPA_dataset/Datasets_Sherpa_11_feb/Forest/Forest_data_13_feb.dbf")
+Cropland1$mean_dep_nhx<-(Cropland1$dep_nhx_2015+ Cropland1$dep_nhx_2016+Cropland1$dep_nhx_2017+Cropland1$dep_nhx_2018+Cropland1$dep_nhx_2019)/5
 
-Forest_data<-Forest_data %>% mutate(Soil_erosion_number =
-                                    case_when(Soil_erosi == -9999 ~ NA_real_,
-                                      Soil_erosi>= 0 &  Soil_erosi<=0.5 ~ 0, 
-                                              Soil_erosi> 0.5 &  Soil_erosi<=1~ 1,
-                                              Soil_erosi> 1 &  Soil_erosi<=2 ~ 2,
-                                              Soil_erosi> 2 &  Soil_erosi<=3 ~ 3,
-                                              Soil_erosi> 3 &  Soil_erosi<=4 ~ 4,
-                                              Soil_erosi> 4 &  Soil_erosi<=5 ~ 5,
-                                              Soil_erosi> 5 &  Soil_erosi<=6 ~ 6,
-                                              Soil_erosi> 6 &  Soil_erosi<=8 ~ 7,
-                                              Soil_erosi> 8 &  Soil_erosi<=10 ~ 8,
-                                              Soil_erosi> 10 ~ 9
-                                    )
+Cropland1$mean_dep_noy<-(Cropland1$dep_noy_2015+ Cropland1$dep_noy_2016+Cropland1$dep_noy_2017+Cropland1$dep_noy_2018+Cropland1$dep_noy_2019)/5
+
+Cropland1$mean_nfer_crop_nh4<-(Cropland1$nfer_crop_nh4_2015+ Cropland1$nfer_crop_nh4_2016+Cropland1$nfer_crop_nh4_2017+
+                                 Cropland1$nfer_crop_nh4_2018+Cropland1$nfer_crop_nh4_2019)/5
+
+Cropland1$mean_nfer_crop_no3<-(Cropland1$nfer_crop_no3_2015_Kg_N_ha+ Cropland1$nfer_crop_no3_2016_Kg_N_ha+Cropland1$nfer_crop_no3_2017_Kg_N_ha+
+                                 Cropland1$nfer_crop_no3_2018_Kg_N_ha+Cropland1$nfer_crop_no3_2019_Kg_N_ha)/5
+
+Cropland1$mean_nmanure_app_crop<-(Cropland1$nmanure_app_crop_2015_Kg_N_ha+ Cropland1$nmanure_app_crop_2016_Kg_N_ha+Cropland1$nmanure_app_crop_2017_Kg_N_ha+
+                                    Cropland1$nmanure_app_crop_2018_Kg_N_ha+Cropland1$nmanure_app_crop_2019_Kg_N_ha)/5
+
+
+Cropland1$Sum_fer_manure<- Cropland1$mean_nfer_crop_nh4+Cropland1$mean_nfer_crop_no3+Cropland1$mean_nmanure_app_crop
+
+Cropland1$sum_fertilizer<- Cropland1$mean_nfer_crop_nh4+Cropland1$mean_nfer_crop_no3
+
+Cropland1$percent_fer_manure<- (Cropland1$sum_fertilizer/Cropland1$Sum_fer_manure)*100
+
+Cropland1$percent_manure<- (Cropland1$mean_nmanure_app_crop/Cropland1$Sum_fer_manure)*100
+
+ hist(Cropland1$percent_manure)
+```
+
+![](README_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+
+``` r
+ Cropland2<- read.dbf("C:/Users/surya/Downloads/SHERPA_dataset/Datasets_Sherpa_11_feb/Cropland/Cropland_data.dbf")
+
+ 
+ Cropland2<- Cropland2[,c(2,76:83)]
+
+ Cropland1<- merge(Cropland1,Cropland2, by = "POINTID")
+
+ Cropland1$Fcover<- Cropland1$Fcover*100
+
+ Cropland1 <- Cropland1 %>%
+   mutate(Fcover_number = case_when(
+     Fcover >= 80 & Fcover <= 100 ~ 10,
+     Fcover < 80 & Fcover >= 75 ~ 9,
+     Fcover < 75 & Fcover >= 70 ~ 8,
+     Fcover < 70 & Fcover >= 65 ~ 7,
+     Fcover < 65 & Fcover >= 60 ~ 6,
+     Fcover < 60 & Fcover >= 55 ~ 5,
+     Fcover < 55 & Fcover >= 50 ~ 4,
+     Fcover < 50 & Fcover >= 45 ~ 3,
+     Fcover < 45 & Fcover >= 40 ~ 2,
+     Fcover < 40 ~ 1
+   ))
+
+ Cropland1 <- Cropland1 %>%
+   mutate(Fertilizer_type_number = case_when(
+     percent_manure == 100 ~ 10,  # Organic fertilizer only
+     percent_manure == 0 ~ 1,  # Mineral fertilizer only
+     percent_manure >= 95 & percent_manure <= 100 ~ 9,
+     percent_manure < 95 & percent_manure >= 80 ~ 8,
+     percent_manure < 80 & percent_manure >= 65 ~ 7,
+     percent_manure < 65 & percent_manure >= 50 ~ 6,
+     percent_manure < 50 & percent_manure >= 35 ~ 5,
+     percent_manure < 35 & percent_manure >= 20 ~ 4,
+     percent_manure < 20 & percent_manure >= 10 ~ 3,
+     percent_manure < 10 & percent_manure >= 0 ~ 2
+   ))
+
+Cropland1$Part2<- (Cropland1$Fcover_number+Cropland1$Fertilizer_type_number)/2
+
+All_data_BO<- read.csv("C:/Users/surya/Downloads/SHERPA_dataset/Cropl_land_Eur_reg1.csv")
+
+
+All_data_BO<- All_data_BO[,c(6,121)]
+
+Cropland_part1<- merge(Cropland4, All_data_BO, by="POINTID")
+
+
+Cropland7<- merge(Cropland_part1, Cropland1, by = "POINTID")
+
+
+Cropland7$Final_number<- Cropland7$Part2-Cropland7$Part1_number
+
+Cropland7<- Cropland7[!is.na(Cropland7$Final_number),]
+
+nrow(Cropland7)
+```
+
+    ## [1] 3644
+
+``` r
+Cropland7<- Cropland7[,c(1,105:125,239:240)]
+
+
+old_names <- c(
+  "Soil_erosion_number", "LS_number", "Zinc_number", "Antimony_number", "Lead_number",
+  "Nickel_number", "Mercury_number", "Cobalt_number", "Chromium_number", "Copper_number",
+  "Cadmium_number", "Arsenic_number", "EC_number", "Nitrogen_number",
+  "Phophorus_number_excess", "Phophorus_number_mining", "Pesticide_Risk_Score", "C_loss_score",
+  "Soil_bulk_density_score", "Part1_number", "Final_number"
 )
-#########################################Landslide
 
-Forest_data<-Forest_data %>% mutate(LS_number =
+new_names <- c(
+  "Soil.erosion", "Landslide", "Zinc", "Antimony", "Lead",
+  "Nickel", "Mercury", "Cobalt", "Chromium", "Copper",
+  "Cadmium", "Arsenic", "Salinity", "Nitrogen.excess",
+  "Phophorus.excess", "Phophorus.mining", "Pesticide.risk", "Carbon.loss",
+  "Compaction", "Part1", "Final_number"
+)
+
+
+Cropland7 <- Cropland7 %>% rename(!!!setNames(old_names,new_names))
+
+
+Part1_part2_grassland <- Cropland7 %>%
+  mutate(Class = as.character(Class))  # Convert Class to character if needed
+
+
+# Compute mean based on Class
+Part1_part2_grassland_avg <- Part1_part2_grassland %>%
+  group_by(Class) %>%
+  summarise(across(where(is.numeric), ~mean(.x, na.rm = TRUE)))
+
+variable_order <- c(
+  "Part2","Soil.erosion","Landslide", "Compaction", "Nitrogen.excess",
+  "Phophorus.excess","Phophorus.mining", "Carbon.loss", "Pesticide.risk", "Salinity", "Zinc",
+  "Antimony", "Lead", "Nickel", "Mercury",
+  "Cobalt", "Chromium", "Copper", "Cadmium",
+  "Arsenic"
+)
+
+data_long <- Part1_part2_grassland_avg %>%
+  dplyr::select(all_of(c("Class", variable_order))) %>%  # Select required variables
+  pivot_longer(cols = -Class,
+               names_to = "Variable",
+               values_to = "Value") %>%
+  mutate(Variable = factor(Variable, levels = variable_order)) %>%  # Order variables
+  group_by(Class) %>%
+  arrange(Class, Variable) %>%  # Ensure correct order for cumulative calculation
+  mutate(Cumulative = if_else(Variable == "Part2", Value, NA_real_)) %>%  # Initialize Cumulative
+  mutate(Cumulative = replace(Cumulative, is.na(Cumulative),
+                              first(Cumulative, order_by = Variable) - cumsum(Value[Variable != "Part2"]))) %>%
+  ungroup()
+
+# Convert Class to a factor (ensures correct color mapping)
+  Cropland7$Class <- as.factor(Cropland7$Class)
+  data_long$Class <- as.factor(data_long$Class)
+  
+# Define custom colors (Make sure these match actual class names)
+# Define custom colors based on the figure colors
+class_colors <- c("#7fbf4d","#d864a6","#ffbf33","#4a98c9") 
+
+ # Histogram Plot
+  ggplot(Cropland7, aes(x = Final_number, fill = Class)) +
+    geom_histogram(binwidth = 2, alpha = 0.6, position = "stack") +
+    labs(title = "Histogram of Final Score (Cropland)",
+         x = "Final SHERPA Score",
+         y = "Count") +
+    scale_fill_manual(values = class_colors) +  # Apply color mapping
+    theme_minimal(base_size = 16) +
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1, size = 16, color = "black"),
+    axis.text.y = element_text(size = 16, color = "black"),
+    axis.title.x = element_text(size = 16, face = "bold"),
+    axis.title.y = element_text(size = 16, face = "bold"),
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    panel.grid.major = element_line(color = "gray80"),
+    panel.grid.minor = element_blank(),
+    legend.position = "top",
+    legend.title = element_text(size = 16, face = "bold"),
+    legend.text = element_text(size = 16)
+  )
+```
+
+![](README_files/figure-gfm/unnamed-chunk-3-2.png)<!-- -->
+
+``` r
+# Line Plot
+ggplot(data_long, aes(x = Variable, y = Cumulative, color = Class, group = Class)) +
+  geom_line(size = 1.2) +
+  geom_point(size = 3) +
+  scale_y_continuous(limits = c(-30, 10)) +
+  scale_color_manual(values = class_colors) +  # Apply color mapping
+  labs(
+    title = "Cumulative Reductions (Cropland)",
+    x = "Variable",
+    y = "Cumulative Reduction",
+    color = "Class"
+  ) +
+  theme_minimal(base_size = 16) +
+  theme(
+   axis.text.x = element_text(angle = 45, hjust = 1, size = 16, color = "black"),
+    axis.text.y = element_text(size = 16, color = "black"),
+    axis.title.x = element_text(size = 16, face = "bold"),
+    axis.title.y = element_text(size = 16, face = "bold"),
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    panel.grid.major = element_line(color = "gray80"),
+    panel.grid.minor = element_blank(),
+    legend.position = "top",
+    legend.title = element_text(size = 16, face = "bold"),
+    legend.text = element_text(size = 16)
+  )
+```
+
+![](README_files/figure-gfm/unnamed-chunk-3-3.png)<!-- -->
+
+## Grassland (Part1)
+
+``` r
+Grassland2<- Grassland[,c(1:52, 78:95)]
+
+Grassland2$Net_phophorus<- (Grassland2$Miniral_P_input+Grassland2$Organic_P_input)
+ 
+Grassland2$EC<- Grassland2$EC/100
+
+Grassland4<- Grassland2[!is.na(Grassland2$Net_phophorus),]
+ 
+## the new file is loaded because the current dataset was missing the carbon stock, Bulk density, land slide density,
+## Risk score, Active ingredient, and soil texture class 
+
+##read grassland_data
+Grassland5<- read.dbf("C:/Users/surya/Downloads/SHERPA_dataset/Datasets_Sherpa_11_feb/Grassland_data.dbf")
+
+Grassland5<- Grassland5[,c(2,72:77)]
+
+Grassland4<- merge(Grassland4, Grassland5, by = "POINTID")
+
+############Soil texture
+
+Grassland4 <- Grassland4 %>% 
+  mutate(Soil_tex_class = case_when(
+    textureUSD == -9999 ~ NA_character_,  # Change to NA_character_
+    textureUSD == 1 ~ "Clay", 
+    textureUSD == 2 ~ "Silty Clay",
+    textureUSD == 3 ~ "Silty Clay Loam",
+    textureUSD == 4 ~ "Sandy Clay",
+    textureUSD == 5 ~ "Sandy Clay Loam",
+    textureUSD == 6 ~ "Clay Loam",
+    textureUSD == 7 ~ "Silt",
+    textureUSD == 8 ~ "Silt Loam",
+    textureUSD == 9 ~ "Loam",
+    textureUSD == 10 ~ "Sand",
+    textureUSD == 11 ~ "Loamy Sand",
+    textureUSD == 12 ~ "Sandy Loam"
+  ))
+
+############Soil erosion
+
+Grassland4<-Grassland4 %>% mutate(Soil_erosion_number =
+                              case_when(Soil_erosion == -9999 ~ NA_real_,
+                                Soil_erosion>= 0 &  Soil_erosion<=0.5 ~ 0, 
+                                        Soil_erosion> 0.5 &  Soil_erosion<=1~ 1,
+                                        Soil_erosion> 1 &  Soil_erosion<=2 ~ 2,
+                                        Soil_erosion> 2 &  Soil_erosion<=3 ~ 3,
+                                        Soil_erosion> 3 &  Soil_erosion<=4 ~ 4,
+                                        Soil_erosion> 4 &  Soil_erosion<=5 ~ 5,
+                                        Soil_erosion> 5 &  Soil_erosion<=6 ~ 6,
+                                        Soil_erosion> 6 &  Soil_erosion<=8 ~ 7,
+                                        Soil_erosion> 8 &  Soil_erosion<=10 ~ 8,
+                                        Soil_erosion> 10 ~ 9
+                              )
+)
+
+###########################landslide density
+
+Grassland4<-Grassland4 %>% mutate(LS_number =
                                     case_when(LS==1 ~ 6, 
                                               LS==2 ~ 1,
                                               LS==3 ~ 4,
@@ -1074,22 +939,22 @@ Forest_data<-Forest_data %>% mutate(LS_number =
 
 #######################Heavy metals
 
-Forest_data<-Forest_data %>% mutate(Zinc_number =
-                                    case_when(Zn == -9999 ~ NA_real_,
-                                      Zn>= 0 &  Zn<=33 ~ 0, 
-                                              Zn> 33 &  Zn<=57~ 1,
-                                              Zn> 57 &  Zn<=81 ~ 2,
-                                              Zn> 81 &  Zn<=105 ~ 3,
-                                              Zn> 105 &  Zn<=129 ~ 4,
-                                              Zn> 129 &  Zn<=153 ~ 5,
-                                              Zn> 153 &  Zn<=177 ~ 6,
-                                              Zn> 177 &  Zn<=201 ~ 7,
-                                              Zn> 201 &  Zn<=225 ~ 8,
-                                              Zn> 225 ~ 9
+Grassland4<-Grassland4 %>% mutate(Zinc_number =
+                                    case_when(Zinc == -9999 ~ NA_real_,
+                                      Zinc>= 0 &  Zinc<=33 ~ 0, 
+                                              Zinc> 33 &  Zinc<=57~ 1,
+                                              Zinc> 57 &  Zinc<=81 ~ 2,
+                                              Zinc> 81 &  Zinc<=105 ~ 3,
+                                              Zinc> 105 &  Zinc<=129 ~ 4,
+                                              Zinc> 129 &  Zinc<=153 ~ 5,
+                                              Zinc> 153 &  Zinc<=177 ~ 6,
+                                              Zinc> 177 &  Zinc<=201 ~ 7,
+                                              Zinc> 201 &  Zinc<=225 ~ 8,
+                                              Zinc> 225 ~ 9
                                     )
 )
 
-Forest_data<-Forest_data %>% mutate(Antimony_number =
+Grassland4<-Grassland4 %>% mutate(Antimony_number =
                                     case_when(Antimony == -9999 ~ NA_real_,
                                       Antimony>= 0 &  Antimony<=0.80 ~ 0, 
                                               Antimony> 0.80 &  Antimony<=1.30 ~ 1,
@@ -1104,7 +969,7 @@ Forest_data<-Forest_data %>% mutate(Antimony_number =
                                     )
 )
 
-Forest_data<-Forest_data %>% mutate(Lead_number =
+Grassland4<-Grassland4 %>% mutate(Lead_number =
                                     case_when(Lead == -9999 ~ NA_real_,
                                       Lead>= 0 &  Lead<=23 ~ 0, 
                                               Lead> 23 &  Lead<=42 ~ 1,
@@ -1119,7 +984,7 @@ Forest_data<-Forest_data %>% mutate(Lead_number =
                                     )
 )
 
-Forest_data<-Forest_data %>% mutate(Nickel_number =
+Grassland4<-Grassland4 %>% mutate(Nickel_number =
                                     case_when(Nickel == -9999 ~ NA_real_,
                                       Nickel>= 0 &  Nickel<=9 ~ 0, 
                                               Nickel> 9 &  Nickel<=14 ~ 1,
@@ -1134,7 +999,7 @@ Forest_data<-Forest_data %>% mutate(Nickel_number =
                                     )
 )
 
-Forest_data<-Forest_data %>% mutate(Mercury_number =
+Grassland4<-Grassland4 %>% mutate(Mercury_number =
                                     case_when(Mercury == -9999 ~ NA_real_,
                                       Mercury>= 0 &  Mercury<=23 ~ 0, 
                                               Mercury> 23 &  Mercury<=179 ~ 1,
@@ -1149,7 +1014,7 @@ Forest_data<-Forest_data %>% mutate(Mercury_number =
                                     )
 )
 
-Forest_data<-Forest_data %>% mutate(Cobalt_number =
+Grassland4<-Grassland4 %>% mutate(Cobalt_number =
                                     case_when(Cobalt == -9999 ~ NA_real_,
                                       Cobalt>= 0 &  Cobalt<=20 ~ 0, 
                                               Cobalt> 20 &  Cobalt<=25 ~ 1,
@@ -1165,7 +1030,7 @@ Forest_data<-Forest_data %>% mutate(Cobalt_number =
 )
 
 
-Forest_data<-Forest_data %>% mutate(Chromium_number =
+Grassland4<-Grassland4 %>% mutate(Chromium_number =
                                     case_when(Chromium == -9999 ~ NA_real_,
                                       Chromium>= 0 &  Chromium<=70 ~ 0, 
                                               Chromium> 70 &  Chromium<=25 ~ 1,
@@ -1180,7 +1045,7 @@ Forest_data<-Forest_data %>% mutate(Chromium_number =
                                     )
 )
 
-Forest_data<-Forest_data %>% mutate(Copper_number =
+Grassland4<-Grassland4 %>% mutate(Copper_number =
                                     case_when(Copper == -9999 ~ NA_real_,
                                       Copper>= 0 &  Copper<=22 ~ 0, 
                                               Copper> 22 &  Copper<=32 ~ 1,
@@ -1195,7 +1060,7 @@ Forest_data<-Forest_data %>% mutate(Copper_number =
                                     )
 )
 
-Forest_data<-Forest_data %>% mutate(Cadmium_number =
+Grassland4<-Grassland4 %>% mutate(Cadmium_number =
                                     case_when(Cadmium == -9999 ~ NA_real_,
                                       Cadmium>= 0 &  Cadmium<=0.5 ~ 0, 
                                               Cadmium> 0.5 &  Cadmium<=0.6 ~ 1,
@@ -1210,65 +1075,137 @@ Forest_data<-Forest_data %>% mutate(Cadmium_number =
                                     )
 )
 
-Forest_data<-Forest_data %>% mutate(Arsenic_number =
-                                    case_when(LUCAS_medi == -9999 ~ NA_real_,
-                                      LUCAS_medi>= 0 &  LUCAS_medi<=10 ~ 0, 
-                                              LUCAS_medi> 10 &  LUCAS_medi<=30 ~ 1,
-                                              LUCAS_medi> 30 & LUCAS_medi<=50~ 2,
-                                              LUCAS_medi> 50 &  LUCAS_medi<=70 ~ 3,
-                                              LUCAS_medi> 70 &  LUCAS_medi<=95 ~ 4,
-                                              LUCAS_medi> 95 &  LUCAS_medi<=120 ~ 5,
-                                              LUCAS_medi> 120 &  LUCAS_medi<=145 ~ 6,
-                                              LUCAS_medi> 145 &  LUCAS_medi<=175 ~ 7,
-                                              LUCAS_medi> 175 &  LUCAS_medi<=200 ~ 8,
-                                              LUCAS_medi> 200 ~ 9
+Grassland4<-Grassland4 %>% mutate(Arsenic_number =
+                                    case_when(Arsenic == -9999 ~ NA_real_,
+                                      Arsenic>= 0 &  Arsenic<=10 ~ 0, 
+                                              Arsenic> 10 &  Arsenic<=30 ~ 1,
+                                              Arsenic> 30 & Arsenic<=50~ 2,
+                                              Arsenic> 50 &  Arsenic<=70 ~ 3,
+                                              Arsenic> 70 &  Arsenic<=95 ~ 4,
+                                              Arsenic> 95 &  Arsenic<=120 ~ 5,
+                                              Arsenic> 120 &  Arsenic<=145 ~ 6,
+                                              Arsenic> 145 &  Arsenic<=175 ~ 7,
+                                              Arsenic> 175 &  Arsenic<=200 ~ 8,
+                                              Arsenic> 200 ~ 9
                                     )
 )
 
-colnames(Forest_data)
-```
 
-    ##  [1] "Field1"              "code23"              "code23_X"           
-    ##  [4] "code23_Y"            "ddlat"               "ddlong"             
-    ##  [7] "Elevation"           "Humus"               "descriptio"         
-    ## [10] "Parent_mat"          "RASTERVALU"          "Cadmium"            
-    ## [13] "Copper"              "Chromium"            "Cobalt"             
-    ## [16] "Mercury"             "Manganese"           "Nickel"             
-    ## [19] "Lead"                "Soil_erosi"          "Antimony"           
-    ## [22] "Zn"                  "LUCAS_medi"          "ndep_nhx15"         
-    ## [25] "Nsurplus1"           "LS"                  "Soil_erosion_number"
-    ## [28] "LS_number"           "Zinc_number"         "Antimony_number"    
-    ## [31] "Lead_number"         "Nickel_number"       "Mercury_number"     
-    ## [34] "Cobalt_number"       "Chromium_number"     "Copper_number"      
-    ## [37] "Cadmium_number"      "Arsenic_number"
 
-``` r
-colnames(Forest_data)[which(colnames(Forest_data)%in% c("Nsurplus1"))]<- "net_nitrogen"
+########################EC
 
-Forest_data<-Forest_data %>% mutate(Nitrogen_number =
-                                  case_when(net_nitrogen == -9999 ~ NA_real_,
-                                    net_nitrogen<2 ~ 0, 
-                                            net_nitrogen> 2 &  net_nitrogen<=3 ~ 1,
-                                            net_nitrogen> 3 & net_nitrogen<=4~ 2,
-                                            net_nitrogen>4 &  net_nitrogen<=5 ~ 3,
-                                            net_nitrogen> 5 &  net_nitrogen<=10 ~ 4,
-                                            net_nitrogen> 10 & net_nitrogen<=15 ~ 5,
-                                            net_nitrogen> 15 &  net_nitrogen<=20 ~ 6,
-                                            net_nitrogen> 20 &  net_nitrogen<=25 ~ 7,
-                                            net_nitrogen> 25 & net_nitrogen<=30 ~ 8,
-                                            net_nitrogen> 30 ~ 9
-                                  )
+Grassland4<-Grassland4 %>% mutate(EC_number =
+                                    case_when(EC == -9999 ~ NA_real_,
+                                      EC>= 0 &  EC<=2 ~ 0, 
+                                              EC> 2 &  EC<=2.2 ~ 1,
+                                              EC> 2.2 & EC<=2.4~ 2,
+                                              EC> 2.4 &  EC<=2.6 ~ 3,
+                                              EC> 2.6 &  EC<=2.9 ~ 4,
+                                              EC> 2.9 &  EC<=3.1 ~ 5,
+                                              EC> 3.1 &  EC<=3.4 ~ 6,
+                                              EC> 3.4 &  EC<=3.7 ~ 7,
+                                              EC> 3.7 &  EC<=4 ~ 8,
+                                              EC> 4 ~ 9
+                                    )
 )
 
+Grassland4<-Grassland4 %>% mutate(Nitrogen_number =
+                                    case_when(Nitrogen_Surplus == -9999 ~ NA_real_,
+                                      Nitrogen_Surplus<2 ~ 0, 
+                                              Nitrogen_Surplus> 2 &  Nitrogen_Surplus<=3 ~ 1,
+                                              Nitrogen_Surplus> 3 & Nitrogen_Surplus<=4~ 2,
+                                              Nitrogen_Surplus>4 &  Nitrogen_Surplus<=5 ~ 3,
+                                              Nitrogen_Surplus> 5 &  Nitrogen_Surplus<=10 ~ 4,
+                                              Nitrogen_Surplus> 10 & Nitrogen_Surplus<=15 ~ 5,
+                                              Nitrogen_Surplus> 15 &  Nitrogen_Surplus<=20 ~ 6,
+                                              Nitrogen_Surplus> 20 &  Nitrogen_Surplus<=25 ~ 7,
+                                              Nitrogen_Surplus> 25 & Nitrogen_Surplus<=30 ~ 8,
+                                              Nitrogen_Surplus> 30 ~ 9
+                                    )
+)
+
+##########################Phosphorus
+
+Grassland4<-Grassland4 %>% mutate(Phophorus_number_excess =
+                                    case_when(Net_phophorus == -9999 ~ NA_real_,
+                                      Net_phophorus>= 0 &  Net_phophorus<=1 ~ 0, 
+                                              Net_phophorus> 1 &  Net_phophorus<=2 ~ 1,
+                                              Net_phophorus> 2 & Net_phophorus<=3~ 2,
+                                              Net_phophorus> 3 &  Net_phophorus<=4 ~ 3,
+                                              Net_phophorus> 4 &  Net_phophorus<=5 ~ 4,
+                                              Net_phophorus> 5 & Net_phophorus<=6 ~ 5,
+                                              Net_phophorus> 6 &  Net_phophorus<=7 ~ 6,
+                                              Net_phophorus> 7 &  Net_phophorus<=8 ~ 7,
+                                              Net_phophorus> 8 & Net_phophorus<=9 ~ 8,
+                                              Net_phophorus> 9 ~ 9
+                                    )
+)
+
+######################################Pesticide
+
+Grassland4 <- Grassland4 %>%
+  mutate(Pesticide_Risk_Score = case_when(
+    RS <= 0 & AI == 0 ~ 0,  # Negligible risk, no active ingredient
+    RS <= 0 & AI >= 0 ~ 1, 
+    RS > 0 & RS <= 1 & AI >= 0 & AI <= 10 ~ 2,# Negligible risk, some active ingredient
+    RS > 1 & RS <= 2 & AI > 1 & AI <= 10 ~ 3,  # Medium-low risk, AI between 1-10
+    RS > 1 & RS <= 2 & AI > 10 & AI <= 20 ~ 4, # Medium-low risk, AI between 10-20
+    RS > 2 & RS <= 3 & AI > 1 & AI <= 10 ~ 5,  # Medium risk, AI between 1-10
+    RS > 2 & RS <= 3 & AI > 10 & AI <= 20 ~ 6, # Medium risk, AI between 10-20
+    RS > 3 & RS <= 4 & AI > 1 & AI <= 10 ~ 7,  # High risk, AI between 1-10
+    RS > 3 & RS <= 4 & AI > 10 & AI <= 20 ~ 8, # High risk, AI between 10-20
+    RS > 4 & AI > 10 ~ 9,  # Very high risk, AI greater than 10
+    TRUE ~ NA_real_  # Assign NA for unclassified cases
+  ))
+
+###################################SOC loss
+
+Grassland4 <- Grassland4 %>% 
+  mutate(C_loss_score = case_when(
+    Stock_carb == -9999 ~ NA_real_,                    # If value is -9999, assign NA
+    Stock_carb >= 0 ~ 0,                                # 0 to positive (e.g., SOC accumulation)
+    Stock_carb > -0.5 & Stock_carb <= 0 ~ 1,            # < 0 to -0.5
+    Stock_carb > -1.5 & Stock_carb <= -0.5 ~ 2,         # < -0.5 to -1.5
+    Stock_carb > -3 & Stock_carb <= -1.5 ~ 3,           # < -1.5 to -3
+    Stock_carb > -4 & Stock_carb <= -3 ~ 4,             # < -3 to -4
+    Stock_carb > -5 & Stock_carb <= -4 ~ 5,             # < -4 to -5
+    Stock_carb > -6 & Stock_carb <= -5 ~ 6,             # < -5 to -6
+    Stock_carb > -7 & Stock_carb <= -6 ~ 7,             # < -6 to -7
+    Stock_carb > -8 & Stock_carb <= -7 ~ 8,             # < -7 to -8
+    Stock_carb < -8 ~ 9                                # < -8
+  ))
 
 
-Forest_data$Part1_number<- Forest_data$Nitrogen_number+Forest_data$Arsenic_number+Forest_data$Cadmium_number+
-  Forest_data$Copper_number+Forest_data$Chromium_number+Forest_data$Cobalt_number+Forest_data$Mercury_number+Forest_data$Nickel_number+Forest_data$Lead_number+Forest_data$Antimony_number+
-  Forest_data$Zinc_number+Forest_data$Soil_erosion_number+Forest_data$LS_number
 
-Forest_data<- Forest_data[!is.na(Forest_data$Part1_number),]
+#########################################compaction
 
-hist(Forest_data$Part1_number)
+Grassland4 <- Grassland4 %>%
+  mutate(BD = ifelse(BD == -9999, NA, BD)) %>%  # Convert BD -9999 to NA
+  mutate(Soil_bulk_density_score = case_when(
+    Soil_tex_class == -9999 ~ NA_real_,
+    Soil_tex_class == "Clay" ~ ifelse(BD < 1.10, 0, ifelse(BD >= 1.10 & BD <= 1.47, 3, 9)),   
+    Soil_tex_class == "Clay Loam" ~ ifelse(BD < 1.40, 0, ifelse(BD >= 1.40 & BD <= 1.75, 3, 9)),   
+    Soil_tex_class == "Loam" ~ ifelse(BD < 1.40, 0, ifelse(BD >= 1.40 & BD <= 1.80, 3, 9)),   
+    Soil_tex_class == "Loamy Sand" ~ ifelse(BD < 1.60, 0, ifelse(BD >= 1.60 & BD <= 1.80, 3, 9)),  
+    Soil_tex_class == "Sand" ~ ifelse(BD < 1.60, 0, ifelse(BD >= 1.60 & BD <= 1.80, 3, 9)),   
+    Soil_tex_class == "Sandy Clay Loam" ~ ifelse(BD < 1.40, 0, ifelse(BD >= 1.40 & BD <= 1.75, 3, 9)),   
+    Soil_tex_class == "Sandy Loam" ~ ifelse(BD < 1.40, 0, ifelse(BD >= 1.40 & BD <= 1.80, 3, 9)),   
+    Soil_tex_class == "Silt Loam" ~ ifelse(BD < 1.40, 0, ifelse(BD >= 1.40 & BD <= 1.65, 3, 9)),   
+    Soil_tex_class == "Silty Clay" ~ ifelse(BD < 1.10, 0, ifelse(BD >= 1.10 & BD <= 1.58, 3, 9)),   
+    Soil_tex_class == "Silty Clay Loam" ~ ifelse(BD < 1.40, 0, ifelse(BD >= 1.40 & BD <= 1.65, 3, 9)),   
+    TRUE ~ NA_real_  # Assign NA for unrecognized texture names
+  ))
+
+########################################################
+
+ Grassland4$Part1_number<- Grassland4$Phophorus_number+Grassland4$Nitrogen_number+Grassland4$EC_number+Grassland4$Arsenic_number+Grassland4$Cadmium_number+
+   Grassland4$Copper_number+Grassland4$Chromium_number+Grassland4$Cobalt_number+Grassland4$Mercury_number+Grassland4$Nickel_number+Grassland4$Lead_number+Grassland4$Antimony_number+
+  Grassland4$Zinc_number+Grassland4$Soil_erosion_number+Grassland4$Soil_bulk_density_score+Grassland4$C_loss_score+Grassland4$Pesticide_Risk_Score+
+   Grassland4$LS_number
+
+Grassland4<- Grassland4[!is.na(Grassland4$Part1_number),]
+
+hist(Grassland4$Part1_number)
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
@@ -1276,11 +1213,11 @@ hist(Forest_data$Part1_number)
 ``` r
 ## Regional variability in Part1 scores across Europe
 
-All_data_BO<- read.csv("C:/Users/surya/Downloads/SHERPA_dataset/Forest_land_Eur_reg.csv")
+All_data_BO<- read.csv("C:/Users/surya/Downloads/SHERPA_dataset/Grassland_land_Eur_reg.csv")
 
-All_data_BO<- All_data_BO[,c(7,59)]
+All_data_BO<- All_data_BO[,c(6,93)]
 
-All_data_BO<- merge(Forest_data, All_data_BO, by = "code23")
+All_data_BO<- merge(Grassland4, All_data_BO, by = "POINTID")
 
 level_order <- c('Northern', 'Western', 'Cent_Eastern', 'Southern') 
 
@@ -1290,24 +1227,22 @@ my_colors <- c(
   "Cent_Eastern" = "#FF0000", # Green
   "Southern" = "#90EE90"  # Yellow
 )
-
 p <- ggplot(All_data_BO, aes(x = factor(Class, level = level_order), y = Part1_number, fill = Class)) + 
-  geom_boxplot(outlier.shape = NA, width = 0.6, alpha = 0.7, position = position_dodge(width = 0.75)) +  # Separate boxplots
-  # Separate points
+  geom_boxplot(outlier.shape = NA, width = 0.6, alpha = 0.7, position = position_dodge(width = 0.75)) +  
   labs(x = "European region [-]",
-       y = "Part1_Number [-]") +  # Add title
-  theme_minimal(base_size = 15) +  # Clean background
+       y = "Part1_Number [-]") +  
+  theme_minimal(base_size = 15) +  
   theme(
     axis.text = element_text(size = 18),
     axis.title = element_text(size = 20, face = "bold"),
-    plot.title = element_text(size = 22, face = "bold", hjust = 0.5),  # Centered title
+    plot.title = element_text(size = 22, face = "bold", hjust = 0.5),  
     legend.position = "bottom",
     legend.text = element_text(size = 18),
     legend.title = element_text(size = 18)
   ) +
-  scale_y_continuous(limits = c(0, 50), expand = c(0, 0)) +  # Set limits and remove extra space
-  scale_fill_manual(values = my_colors) +  # Apply custom colors to fill
-  scale_color_manual(values = my_colors)  # Apply custom colors to points
+  scale_y_continuous(limits = c(0, 50), expand = c(0, 0)) +  
+  scale_fill_manual(values = my_colors) +  
+  scale_color_manual(values = my_colors)  
 
 print(p)
 ```
@@ -1495,121 +1430,353 @@ ggplot(data_long, aes(x = Variable, y = Cumulative, color = Class, group = Class
 
 ![](README_files/figure-gfm/unnamed-chunk-5-3.png)<!-- -->
 
-## Cropland (Part2)
+## Forest (Part1)
 
 ``` r
-Cropland1$mean_dep_nhx<-(Cropland1$dep_nhx_2015+ Cropland1$dep_nhx_2016+Cropland1$dep_nhx_2017+Cropland1$dep_nhx_2018+Cropland1$dep_nhx_2019)/5
+Forest_data<- read.dbf("C:/Users/surya/Downloads/SHERPA_dataset/Datasets_Sherpa_11_feb/Forest/Forest_data_13_feb.dbf")
 
-Cropland1$mean_dep_noy<-(Cropland1$dep_noy_2015+ Cropland1$dep_noy_2016+Cropland1$dep_noy_2017+Cropland1$dep_noy_2018+Cropland1$dep_noy_2019)/5
+Forest_data<-Forest_data %>% mutate(Soil_erosion_number =
+                                    case_when(Soil_erosi == -9999 ~ NA_real_,
+                                      Soil_erosi>= 0 &  Soil_erosi<=0.5 ~ 0, 
+                                              Soil_erosi> 0.5 &  Soil_erosi<=1~ 1,
+                                              Soil_erosi> 1 &  Soil_erosi<=2 ~ 2,
+                                              Soil_erosi> 2 &  Soil_erosi<=3 ~ 3,
+                                              Soil_erosi> 3 &  Soil_erosi<=4 ~ 4,
+                                              Soil_erosi> 4 &  Soil_erosi<=5 ~ 5,
+                                              Soil_erosi> 5 &  Soil_erosi<=6 ~ 6,
+                                              Soil_erosi> 6 &  Soil_erosi<=8 ~ 7,
+                                              Soil_erosi> 8 &  Soil_erosi<=10 ~ 8,
+                                              Soil_erosi> 10 ~ 9
+                                    )
+)
+#########################################Landslide
 
-Cropland1$mean_nfer_crop_nh4<-(Cropland1$nfer_crop_nh4_2015+ Cropland1$nfer_crop_nh4_2016+Cropland1$nfer_crop_nh4_2017+
-                                 Cropland1$nfer_crop_nh4_2018+Cropland1$nfer_crop_nh4_2019)/5
+Forest_data<-Forest_data %>% mutate(LS_number =
+                                    case_when(LS==1 ~ 6, 
+                                              LS==2 ~ 1,
+                                              LS==3 ~ 4,
+                                              LS== -9999 ~ 0
+                                    )
+)
 
-Cropland1$mean_nfer_crop_no3<-(Cropland1$nfer_crop_no3_2015_Kg_N_ha+ Cropland1$nfer_crop_no3_2016_Kg_N_ha+Cropland1$nfer_crop_no3_2017_Kg_N_ha+
-                                 Cropland1$nfer_crop_no3_2018_Kg_N_ha+Cropland1$nfer_crop_no3_2019_Kg_N_ha)/5
 
-Cropland1$mean_nmanure_app_crop<-(Cropland1$nmanure_app_crop_2015_Kg_N_ha+ Cropland1$nmanure_app_crop_2016_Kg_N_ha+Cropland1$nmanure_app_crop_2017_Kg_N_ha+
-                                    Cropland1$nmanure_app_crop_2018_Kg_N_ha+Cropland1$nmanure_app_crop_2019_Kg_N_ha)/5
+#######################Heavy metals
+
+Forest_data<-Forest_data %>% mutate(Zinc_number =
+                                    case_when(Zn == -9999 ~ NA_real_,
+                                      Zn>= 0 &  Zn<=33 ~ 0, 
+                                              Zn> 33 &  Zn<=57~ 1,
+                                              Zn> 57 &  Zn<=81 ~ 2,
+                                              Zn> 81 &  Zn<=105 ~ 3,
+                                              Zn> 105 &  Zn<=129 ~ 4,
+                                              Zn> 129 &  Zn<=153 ~ 5,
+                                              Zn> 153 &  Zn<=177 ~ 6,
+                                              Zn> 177 &  Zn<=201 ~ 7,
+                                              Zn> 201 &  Zn<=225 ~ 8,
+                                              Zn> 225 ~ 9
+                                    )
+)
+
+Forest_data<-Forest_data %>% mutate(Antimony_number =
+                                    case_when(Antimony == -9999 ~ NA_real_,
+                                      Antimony>= 0 &  Antimony<=0.80 ~ 0, 
+                                              Antimony> 0.80 &  Antimony<=1.30 ~ 1,
+                                              Antimony> 1.30 &  Antimony<=1.80~ 2,
+                                              Antimony> 1.80 &  Antimony<=2.30 ~ 3,
+                                              Antimony> 2.30 &  Antimony<=2.80 ~ 4,
+                                              Antimony> 2.80 &  Antimony<=3.20 ~ 5,
+                                              Antimony> 3.20 &  Antimony<=3.80 ~ 6,
+                                              Antimony> 3.80 &  Antimony<=4.30 ~ 7,
+                                              Antimony> 4.30 &  Antimony<=5.00 ~ 8,
+                                              Antimony> 5 ~ 9
+                                    )
+)
+
+Forest_data<-Forest_data %>% mutate(Lead_number =
+                                    case_when(Lead == -9999 ~ NA_real_,
+                                      Lead>= 0 &  Lead<=23 ~ 0, 
+                                              Lead> 23 &  Lead<=42 ~ 1,
+                                              Lead> 42 &  Lead<=61~ 2,
+                                              Lead> 61 &  Lead<=80 ~ 3,
+                                              Lead> 80 &  Lead<=99 ~ 4,
+                                              Lead> 99 &  Lead<=118 ~ 5,
+                                              Lead> 118 &  Lead<=137 ~ 6,
+                                              Lead> 137 &  Lead<=156 ~ 7,
+                                              Lead> 156 &  Lead<=175 ~ 8,
+                                              Lead> 175 ~ 9
+                                    )
+)
+
+Forest_data<-Forest_data %>% mutate(Nickel_number =
+                                    case_when(Nickel == -9999 ~ NA_real_,
+                                      Nickel>= 0 &  Nickel<=9 ~ 0, 
+                                              Nickel> 9 &  Nickel<=14 ~ 1,
+                                              Nickel> 14 & Nickel<=20~ 2,
+                                              Nickel> 20 &  Nickel<=25 ~ 3,
+                                              Nickel> 25 &  Nickel<=31 ~ 4,
+                                              Nickel> 31 &  Nickel<=36 ~ 5,
+                                              Nickel> 36 &  Nickel<=42 ~ 6,
+                                              Nickel> 42 &  Nickel<=47 ~ 7,
+                                              Nickel> 47 &  Nickel<=53 ~ 8,
+                                              Nickel> 53 ~ 9
+                                    )
+)
+
+Forest_data<-Forest_data %>% mutate(Mercury_number =
+                                    case_when(Mercury == -9999 ~ NA_real_,
+                                      Mercury>= 0 &  Mercury<=23 ~ 0, 
+                                              Mercury> 23 &  Mercury<=179 ~ 1,
+                                              Mercury> 179 & Mercury<=332~ 2,
+                                              Mercury> 332 &  Mercury<=485 ~ 3,
+                                              Mercury> 485 &  Mercury<=638 ~ 4,
+                                              Mercury> 638 &  Mercury<=791 ~ 5,
+                                              Mercury> 791 &  Mercury<=944 ~ 6,
+                                              Mercury> 944 &  Mercury<=1097 ~ 7,
+                                              Mercury> 1097 &  Mercury<=1250 ~ 8,
+                                              Mercury> 1250 ~ 9
+                                    )
+)
+
+Forest_data<-Forest_data %>% mutate(Cobalt_number =
+                                    case_when(Cobalt == -9999 ~ NA_real_,
+                                      Cobalt>= 0 &  Cobalt<=20 ~ 0, 
+                                              Cobalt> 20 &  Cobalt<=25 ~ 1,
+                                              Cobalt> 25 & Cobalt<=30~ 2,
+                                              Cobalt> 30 &  Cobalt<=35 ~ 3,
+                                              Cobalt> 35 &  Cobalt<=40 ~ 4,
+                                              Cobalt> 40 &  Cobalt<=45 ~ 5,
+                                              Cobalt> 45 &  Cobalt<=50 ~ 6,
+                                              Cobalt> 50 &  Cobalt<=55 ~ 7,
+                                              Cobalt> 55 &  Cobalt<=60 ~ 8,
+                                              Cobalt> 60 ~ 9
+                                    )
+)
 
 
-Cropland1$Sum_fer_manure<- Cropland1$mean_nfer_crop_nh4+Cropland1$mean_nfer_crop_no3+Cropland1$mean_nmanure_app_crop
+Forest_data<-Forest_data %>% mutate(Chromium_number =
+                                    case_when(Chromium == -9999 ~ NA_real_,
+                                      Chromium>= 0 &  Chromium<=70 ~ 0, 
+                                              Chromium> 70 &  Chromium<=25 ~ 1,
+                                              Chromium> 90 & Chromium<=30~ 2,
+                                              Chromium> 110 &  Chromium<=35 ~ 3,
+                                              Chromium> 130 &  Chromium<=40 ~ 4,
+                                              Chromium> 155 &  Chromium<=45 ~ 5,
+                                              Chromium> 180 &  Chromium<=50 ~ 6,
+                                              Chromium> 205 &  Chromium<=55 ~ 7,
+                                              Chromium> 230 &  Chromium<=60 ~ 8,
+                                              Chromium> 250 ~ 9
+                                    )
+)
 
-Cropland1$sum_fertilizer<- Cropland1$mean_nfer_crop_nh4+Cropland1$mean_nfer_crop_no3
+Forest_data<-Forest_data %>% mutate(Copper_number =
+                                    case_when(Copper == -9999 ~ NA_real_,
+                                      Copper>= 0 &  Copper<=22 ~ 0, 
+                                              Copper> 22 &  Copper<=32 ~ 1,
+                                              Copper> 32 & Copper<=41~ 2,
+                                              Copper> 41 &  Copper<=50 ~ 3,
+                                              Copper> 50 &  Copper<=59 ~ 4,
+                                              Copper> 59 &  Copper<=68 ~ 5,
+                                              Copper> 68 &  Copper<=77 ~ 6,
+                                              Copper> 77 &  Copper<=86 ~ 7,
+                                              Copper> 86 &  Copper<=95 ~ 8,
+                                              Copper> 95 ~ 9
+                                    )
+)
 
-Cropland1$percent_fer_manure<- (Cropland1$sum_fertilizer/Cropland1$Sum_fer_manure)*100
+Forest_data<-Forest_data %>% mutate(Cadmium_number =
+                                    case_when(Cadmium == -9999 ~ NA_real_,
+                                      Cadmium>= 0 &  Cadmium<=0.5 ~ 0, 
+                                              Cadmium> 0.5 &  Cadmium<=0.6 ~ 1,
+                                              Cadmium> 0.6 & Cadmium<=0.8~ 2,
+                                              Cadmium> 0.8 &  Cadmium<=1.0 ~ 3,
+                                              Cadmium> 1.0 &  Cadmium<=1.2 ~ 4,
+                                              Cadmium> 1.2 &  Cadmium<=1.4 ~ 5,
+                                              Cadmium> 1.4 &  Cadmium<=1.6 ~ 6,
+                                              Cadmium> 1.6 &  Cadmium<=1.8 ~ 7,
+                                              Cadmium> 1.8 &  Cadmium<=2.0 ~ 8,
+                                              Cadmium> 2.0 ~ 9
+                                    )
+)
 
-Cropland1$percent_manure<- (Cropland1$mean_nmanure_app_crop/Cropland1$Sum_fer_manure)*100
+Forest_data<-Forest_data %>% mutate(Arsenic_number =
+                                    case_when(LUCAS_medi == -9999 ~ NA_real_,
+                                      LUCAS_medi>= 0 &  LUCAS_medi<=10 ~ 0, 
+                                              LUCAS_medi> 10 &  LUCAS_medi<=30 ~ 1,
+                                              LUCAS_medi> 30 & LUCAS_medi<=50~ 2,
+                                              LUCAS_medi> 50 &  LUCAS_medi<=70 ~ 3,
+                                              LUCAS_medi> 70 &  LUCAS_medi<=95 ~ 4,
+                                              LUCAS_medi> 95 &  LUCAS_medi<=120 ~ 5,
+                                              LUCAS_medi> 120 &  LUCAS_medi<=145 ~ 6,
+                                              LUCAS_medi> 145 &  LUCAS_medi<=175 ~ 7,
+                                              LUCAS_medi> 175 &  LUCAS_medi<=200 ~ 8,
+                                              LUCAS_medi> 200 ~ 9
+                                    )
+)
 
- hist(Cropland1$percent_manure)
+
+colnames(Forest_data)[which(colnames(Forest_data)%in% c("Nsurplus1"))]<- "net_nitrogen"
+
+Forest_data<-Forest_data %>% mutate(Nitrogen_number =
+                                  case_when(net_nitrogen == -9999 ~ NA_real_,
+                                    net_nitrogen<2 ~ 0, 
+                                            net_nitrogen> 2 &  net_nitrogen<=3 ~ 1,
+                                            net_nitrogen> 3 & net_nitrogen<=4~ 2,
+                                            net_nitrogen>4 &  net_nitrogen<=5 ~ 3,
+                                            net_nitrogen> 5 &  net_nitrogen<=10 ~ 4,
+                                            net_nitrogen> 10 & net_nitrogen<=15 ~ 5,
+                                            net_nitrogen> 15 &  net_nitrogen<=20 ~ 6,
+                                            net_nitrogen> 20 &  net_nitrogen<=25 ~ 7,
+                                            net_nitrogen> 25 & net_nitrogen<=30 ~ 8,
+                                            net_nitrogen> 30 ~ 9
+                                  )
+)
+
+
+
+Forest_data$Part1_number<- Forest_data$Nitrogen_number+Forest_data$Arsenic_number+Forest_data$Cadmium_number+
+  Forest_data$Copper_number+Forest_data$Chromium_number+Forest_data$Cobalt_number+Forest_data$Mercury_number+Forest_data$Nickel_number+Forest_data$Lead_number+Forest_data$Antimony_number+
+  Forest_data$Zinc_number+Forest_data$Soil_erosion_number+Forest_data$LS_number
+
+Forest_data<- Forest_data[!is.na(Forest_data$Part1_number),]
+
+hist(Forest_data$Part1_number)
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 ``` r
- Cropland2<- read.dbf("C:/Users/surya/Downloads/SHERPA_dataset/Datasets_Sherpa_11_feb/Cropland/Cropland_data.dbf")
+## Regional variability in Part1 scores across Europe
 
- 
- Cropland2<- Cropland2[,c(2,76:83)]
+All_data_BO<- read.csv("C:/Users/surya/Downloads/SHERPA_dataset/Forest_land_Eur_reg.csv")
 
- Cropland1<- merge(Cropland1,Cropland2, by = "POINTID")
+All_data_BO<- All_data_BO[,c(7,59)]
 
- Cropland1$Fcover<- Cropland1$Fcover*100
+All_data_BO<- merge(Forest_data, All_data_BO, by = "code23")
 
- Cropland1 <- Cropland1 %>%
-   mutate(Fcover_number = case_when(
-     Fcover >= 80 & Fcover <= 100 ~ 10,
-     Fcover < 80 & Fcover >= 75 ~ 9,
-     Fcover < 75 & Fcover >= 70 ~ 8,
-     Fcover < 70 & Fcover >= 65 ~ 7,
-     Fcover < 65 & Fcover >= 60 ~ 6,
-     Fcover < 60 & Fcover >= 55 ~ 5,
-     Fcover < 55 & Fcover >= 50 ~ 4,
-     Fcover < 50 & Fcover >= 45 ~ 3,
-     Fcover < 45 & Fcover >= 40 ~ 2,
-     Fcover < 40 ~ 1
-   ))
+level_order <- c('Northern', 'Western', 'Cent_Eastern', 'Southern') 
 
- Cropland1 <- Cropland1 %>%
-   mutate(Fertilizer_type_number = case_when(
-     percent_manure == 100 ~ 10,  # Organic fertilizer only
-     percent_manure == 0 ~ 1,  # Mineral fertilizer only
-     percent_manure >= 95 & percent_manure <= 100 ~ 9,
-     percent_manure < 95 & percent_manure >= 80 ~ 8,
-     percent_manure < 80 & percent_manure >= 65 ~ 7,
-     percent_manure < 65 & percent_manure >= 50 ~ 6,
-     percent_manure < 50 & percent_manure >= 35 ~ 5,
-     percent_manure < 35 & percent_manure >= 20 ~ 4,
-     percent_manure < 20 & percent_manure >= 10 ~ 3,
-     percent_manure < 10 & percent_manure >= 0 ~ 2
-   ))
+my_colors <- c(
+  "Northern" = "#0000FF", # Orange
+  "Western" = "#800080", # Blue
+  "Cent_Eastern" = "#FF0000", # Green
+  "Southern" = "#90EE90"  # Yellow
+)
 
-Cropland1$Part2<- (Cropland1$Fcover_number+Cropland1$Fertilizer_type_number)/2
+p <- ggplot(All_data_BO, aes(x = factor(Class, level = level_order), y = Part1_number, fill = Class)) + 
+  geom_boxplot(outlier.shape = NA, width = 0.6, alpha = 0.7, position = position_dodge(width = 0.75)) +  # Separate boxplots
+  # Separate points
+  labs(x = "European region [-]",
+       y = "Part1_Number [-]") +  # Add title
+  theme_minimal(base_size = 15) +  # Clean background
+  theme(
+    axis.text = element_text(size = 18),
+    axis.title = element_text(size = 20, face = "bold"),
+    plot.title = element_text(size = 22, face = "bold", hjust = 0.5),  # Centered title
+    legend.position = "bottom",
+    legend.text = element_text(size = 18),
+    legend.title = element_text(size = 18)
+  ) +
+  scale_y_continuous(limits = c(0, 50), expand = c(0, 0)) +  # Set limits and remove extra space
+  scale_fill_manual(values = my_colors) +  # Apply custom colors to fill
+  scale_color_manual(values = my_colors)  # Apply custom colors to points
 
-All_data_BO<- read.csv("C:/Users/surya/Downloads/SHERPA_dataset/Cropl_land_Eur_reg1.csv")
-
-
-All_data_BO<- All_data_BO[,c(6,121)]
-
-Cropland_part1<- merge(Cropland4, All_data_BO, by="POINTID")
-
-
-Cropland7<- merge(Cropland_part1, Cropland1, by = "POINTID")
-
-
-Cropland7$Final_number<- Cropland7$Part2-Cropland7$Part1_number
-
-Cropland7<- Cropland7[!is.na(Cropland7$Final_number),]
-
-nrow(Cropland7)
+print(p)
 ```
 
-    ## [1] 3644
+![](README_files/figure-gfm/unnamed-chunk-6-2.png)<!-- -->
+
+## Forest (Part2)
 
 ``` r
-Cropland7<- Cropland7[,c(1,105:125,239:240)]
+Forest_data2<- read.csv("C:/Users/surya/Downloads/SHERPA_dataset/ICP_geo_shp_elev1.csv")
+
+# Get the names of all sheets in the Excel file
+sheet_names <- excel_sheets("C:/Users/surya/Documents/ICP_Forest_data/AFSCDB-LII_to_share/AFSCDB.II.2.2_to_share.xlsx")
+
+# Read each sheet into separate data frames
+
+df6 <- read_excel("C:/Users/surya/Documents/ICP_Forest_data/AFSCDB-LII_to_share/AFSCDB.II.2.2_to_share.xlsx", sheet = 6)
+
+df6$code23<- paste(df6$code_country,df6$code_plot,sep = "_")
 
 
+df61<- df6[,c(1:12,52)]
+
+Fores_data23<- merge(Forest_data2, df61, by = "code23")
+
+############
+
+Fisrt_case<- Fores_data23[Fores_data23$elevation<=1400,]
+First_case_cac<- Fisrt_case[Fisrt_case$SHERPA__as=="A",]
+
+unique(First_case_cac$code_horizon_master)
+```
+
+    ##  [1] "A"     "B"     "R"     "OL"    "C"     "OF"    "AC"    "BC"    "BA"   
+    ## [10] "E"     "OH"    "AE"    "AB"    "AR"    "BR"    "OF/OH" "B/C"   "CB"   
+    ## [19] "A/C"   "CA"    "O"
+
+``` r
+selected_classes <- c("OL", "OF", "OH","OF/OH", "O")
+
+# Filter rows based on selected classes
+filtered_data_forest <- First_case_cac %>%
+  filter(code_horizon_master %in% selected_classes)
+
+##################################################
+
+Second_case<- Fores_data23[Fores_data23$elevation<=1400,]
+Second_case_cac<- Second_case[Second_case$SHERPA__as=="B",]
+
+unique(Second_case_cac$code_horizon_master)
+```
+
+    ##  [1] "AB"    "A"     "OH"    "C"     "OF"    "OL"    "B"     "O"     "R"    
+    ## [10] "BA"    "AC"    "E"     "BC"    "P"     "CS"    "PS"    "S"     "EB"   
+    ## [19] "A/B"   "AE"    "CB"    "BE"    "B/C"   "OF/OH" "A/E"   "B/E"   "OA"   
+    ## [28] "E/A"   "OFH"
+
+``` r
+selected_classes <- c("OL", "OF", "OH","OF/OH", "O", "OFH")
+
+# Filter rows based on selected classes
+filtered_data_forest_Sec <- Second_case_cac %>%
+  filter(code_horizon_master %in% selected_classes)
+############################################################
+
+Forest_part2<- read.csv("C:/Users/surya/Downloads/SHERPA_dataset/Part2_Forest.csv")
+Forest_part11<- Forest_part2[,c(2,13)]
+Forest_data11<- merge(Forest_data, Forest_part11, by = "code23")
+Forest_data11$Final_number<- Forest_data11$Part2.score_Forest-Forest_data11$Part1_number
+
+All_data_BO<- read.csv("C:/Users/surya/Downloads/SHERPA_dataset/Forest_land_Eur_reg.csv")
+
+All_data_BO<- All_data_BO[,c(7,59)]
+
+Forest_part1<- merge(Forest_data11, All_data_BO, by="code23")
+
+Forest_part1<- Forest_part1[,c(1,26:43)]
+
+nrow(Forest_part1)
+```
+
+    ## [1] 186
+
+``` r
 old_names <- c(
   "Soil_erosion_number", "LS_number", "Zinc_number", "Antimony_number", "Lead_number",
   "Nickel_number", "Mercury_number", "Cobalt_number", "Chromium_number", "Copper_number",
-  "Cadmium_number", "Arsenic_number", "EC_number", "Nitrogen_number",
-  "Phophorus_number_excess", "Phophorus_number_mining", "Pesticide_Risk_Score", "C_loss_score",
-  "Soil_bulk_density_score", "Part1_number", "Final_number"
-)
+  "Cadmium_number", "Arsenic_number",  "Nitrogen_number", "Part1_number","Part2.score_Forest", "Final_number")
 
 new_names <- c(
   "Soil.erosion", "Landslide", "Zinc", "Antimony", "Lead",
   "Nickel", "Mercury", "Cobalt", "Chromium", "Copper",
-  "Cadmium", "Arsenic", "Salinity", "Nitrogen.excess",
-  "Phophorus.excess", "Phophorus.mining", "Pesticide.risk", "Carbon.loss",
-  "Compaction", "Part1", "Final_number"
+  "Cadmium", "Arsenic", "Nitrogen.excess", "Part1","Part2", "Final_number"
 )
 
+Forest_part1 <- Forest_part1 %>% rename(!!!setNames(old_names,new_names))
 
-Cropland7 <- Cropland7 %>% rename(!!!setNames(old_names,new_names))
-
-
-Part1_part2_grassland <- Cropland7 %>%
+Part1_part2_grassland <- Forest_part1 %>%
   mutate(Class = as.character(Class))  # Convert Class to character if needed
 
 
@@ -1619,13 +1786,13 @@ Part1_part2_grassland_avg <- Part1_part2_grassland %>%
   summarise(across(where(is.numeric), ~mean(.x, na.rm = TRUE)))
 
 variable_order <- c(
-  "Part2","Soil.erosion","Landslide", "Compaction", "Nitrogen.excess",
-  "Phophorus.excess","Phophorus.mining", "Carbon.loss", "Pesticide.risk", "Salinity", "Zinc",
+  "Part2","Soil.erosion","Landslide", "Nitrogen.excess", "Zinc",
   "Antimony", "Lead", "Nickel", "Mercury",
   "Cobalt", "Chromium", "Copper", "Cadmium",
   "Arsenic"
 )
 
+# Transform the data to long format and filter variables
 data_long <- Part1_part2_grassland_avg %>%
   dplyr::select(all_of(c("Class", variable_order))) %>%  # Select required variables
   pivot_longer(cols = -Class,
@@ -1640,23 +1807,22 @@ data_long <- Part1_part2_grassland_avg %>%
   ungroup()
 
 # Convert Class to a factor (ensures correct color mapping)
-  Cropland7$Class <- as.factor(Cropland7$Class)
-  data_long$Class <- as.factor(data_long$Class)
-  
-# Define custom colors (Make sure these match actual class names)
+Forest_part1$Class <- as.factor(Forest_part1$Class)
+data_long$Class <- as.factor(data_long$Class)
+
 # Define custom colors based on the figure colors
 class_colors <- c("#7fbf4d","#d864a6","#ffbf33","#4a98c9") 
 
- # Histogram Plot
-  ggplot(Cropland7, aes(x = Final_number, fill = Class)) +
-    geom_histogram(binwidth = 2, alpha = 0.6, position = "stack") +
-    labs(title = "Histogram of Final Score (Cropland)",
-         x = "Final SHERPA Score",
-         y = "Count") +
-    scale_fill_manual(values = class_colors) +  # Apply color mapping
-    theme_minimal(base_size = 16) +
-    theme(
-      axis.text.x = element_text(angle = 45, hjust = 1, size = 16, color = "black"),
+# Histogram Plot
+ggplot(Forest_part1, aes(x = Final_number, fill = Class)) +
+  geom_histogram(binwidth = 2, alpha = 0.6, position = "stack")+
+  labs(title = "Histogram of Final Score (Forest)",
+       x = "Final SHERPA Score",
+       y = "Count") +
+  scale_fill_manual(values = class_colors) +  # Apply color mapping
+  theme_minimal(base_size = 16) +
+  theme(
+   axis.text.x = element_text(angle = 45, hjust = 1, size = 16, color = "black"),
     axis.text.y = element_text(size = 16, color = "black"),
     axis.title.x = element_text(size = 16, face = "bold"),
     axis.title.y = element_text(size = 16, face = "bold"),
@@ -1669,17 +1835,17 @@ class_colors <- c("#7fbf4d","#d864a6","#ffbf33","#4a98c9")
   )
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-6-2.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 ``` r
 # Line Plot
 ggplot(data_long, aes(x = Variable, y = Cumulative, color = Class, group = Class)) +
   geom_line(size = 1.2) +
   geom_point(size = 3) +
-  scale_y_continuous(limits = c(-30, 10)) +
+  scale_y_continuous(limits = c(-15, 10)) +
   scale_color_manual(values = class_colors) +  # Apply color mapping
   labs(
-    title = "Cumulative Reductions (Cropland)",
+    title = "Cumulative Reductions (Forest)",
     x = "Variable",
     y = "Cumulative Reduction",
     color = "Class"
@@ -1699,4 +1865,4 @@ ggplot(data_long, aes(x = Variable, y = Cumulative, color = Class, group = Class
   )
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-6-3.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-7-2.png)<!-- -->
