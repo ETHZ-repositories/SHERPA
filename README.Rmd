@@ -1255,8 +1255,7 @@ Cropland1$percent_manure<- (Cropland1$mean_nmanure_app_crop/Cropland1$Sum_fer_ma
 
  Cropland2<- read.dbf("C:/Users/surya/Downloads/SHERPA_dataset/Datasets_Sherpa_11_feb/Cropland/Cropland_data.dbf")
 
- colnames(Cropland2)
-
+ 
  Cropland2<- Cropland2[,c(2,76:83)]
 
  Cropland1<- merge(Cropland1,Cropland2, by = "POINTID")
@@ -1295,7 +1294,6 @@ Cropland1$Part2<- (Cropland1$Fcover_number+Cropland1$Fertilizer_type_number)/2
 
 All_data_BO<- read.csv("C:/Users/surya/Downloads/SHERPA_dataset/Cropl_land_Eur_reg1.csv")
 
-colnames(All_data_BO)
 
 All_data_BO<- All_data_BO[,c(6,121)]
 
@@ -1313,7 +1311,6 @@ nrow(Cropland7)
 
 Cropland7<- Cropland7[,c(1,105:125,239:240)]
 
-colnames(Cropland7)
 
 old_names <- c(
   "Soil_erosion_number", "LS_number", "Zinc_number", "Antimony_number", "Lead_number",
@@ -1334,20 +1331,15 @@ new_names <- c(
 
 Cropland7 <- Cropland7 %>% rename(!!!setNames(old_names,new_names))
 
-colnames(Cropland7)
 
 Part1_part2_grassland <- Cropland7 %>%
   mutate(Class = as.character(Class))  # Convert Class to character if needed
 
-#colnames(test)[which(colnames(test)%in% c("Fcover_number"))]<- "Part2"
 
 # Compute mean based on Class
 Part1_part2_grassland_avg <- Part1_part2_grassland %>%
   group_by(Class) %>%
   summarise(across(where(is.numeric), ~mean(.x, na.rm = TRUE)))
-
-summary(Part1_part2_grassland_avg)
-
 
 variable_order <- c(
   "Part2","Soil.erosion","Landslide", "Compaction", "Nitrogen.excess",
@@ -1426,5 +1418,7 @@ ggplot(data_long, aes(x = Variable, y = Cumulative, color = Class, group = Class
     legend.text = element_text(size = 16)
   )
 
-
 ```
+
+
+
