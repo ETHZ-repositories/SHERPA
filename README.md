@@ -10,6 +10,7 @@ Dise, Panos Panagos, Pasquale Borrelli
 - [Cropland (Part1)](#cropland-part1)
 - [Forest (Part1)](#forest-part1)
 - [Grassland (Part2)](#grassland-part2)
+- [Cropland (Part2)](#cropland-part2)
 
 We introduce SHERPA (Soil Health Evaluation, Rating Protocol, and
 Assessment) as a framework and present a first assessment across Europe.
@@ -609,6 +610,8 @@ hist(Grassland4$Part1_number)
 ![](README_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
 
 ``` r
+## Regional variability in Part1 scores across Europe
+
 All_data_BO<- read.csv("C:/Users/surya/Downloads/SHERPA_dataset/Grassland_land_Eur_reg.csv")
 
 All_data_BO<- All_data_BO[,c(6,93)]
@@ -648,7 +651,7 @@ print(p)
 ## Cropland (Part1)
 
 ``` r
-Cropland1<- cropland[,c(1:62, 73:77, 88:91,92:95)]
+Cropland1<- cropland[,c(1:95)]
 
 Cropland2<- read.dbf("C:/Users/surya/Downloads/SHERPA_dataset/Datasets_Sherpa_11_feb/Cropland/Cropland_data.dbf")
 
@@ -989,7 +992,7 @@ Cropland4<- Cropland3
 
 Cropland4$Part1_number<- Cropland4$Nitrogen_number+Cropland4$EC_number+Cropland4$Arsenic_number+Cropland4$Cadmium_number+
   Cropland4$Copper_number+Cropland4$Chromium_number+Cropland4$Cobalt_number+Cropland4$Mercury_number+Cropland4$Nickel_number+Cropland4$Lead_number+Cropland4$Antimony_number+Cropland4$Zinc_number+Cropland4$Soil_erosion_number+Cropland4$Phophorus_number_excess+Cropland4$Phophorus_number_mining+Cropland4$Soil_bulk_density_score+
-  Cropland4$Pesticide_Risk_Score+Cropland4$LS_number
+  Cropland4$Pesticide_Risk_Score+Cropland4$LS_number+Cropland4$C_loss_score
 
 Cropland4<- Cropland4[!is.na(Cropland4$Part1_number),]
 
@@ -999,6 +1002,8 @@ hist(Cropland4$Part1_number)
 ![](README_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
 
 ``` r
+## Regional variability in Part1 scores across Europe
+
 All_data_BO<- read.csv("C:/Users/surya/Downloads/SHERPA_dataset/Cropl_land_Eur_reg1.csv")
 
 All_data_BO<- All_data_BO[,c(6,121)]
@@ -1269,6 +1274,8 @@ hist(Forest_data$Part1_number)
 ![](README_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
 ``` r
+## Regional variability in Part1 scores across Europe
+
 All_data_BO<- read.csv("C:/Users/surya/Downloads/SHERPA_dataset/Forest_land_Eur_reg.csv")
 
 All_data_BO<- All_data_BO[,c(7,59)]
@@ -1310,6 +1317,8 @@ print(p)
 ## Grassland (Part2)
 
 ``` r
+## Extracting Land use/land cover data for the period 2016–2020 to extract the permanent grassland sites
+
 grid <- list.files("D:/LULC/2020/2020_1/" , pattern = "*.tif$")
 All_cov <- raster::stack(paste0("D:/LULC/2020/2020_1/", grid))
 
@@ -1361,6 +1370,8 @@ Grasslandpart1<- merge( Grassland4, All_data_BO, by="POINTID")
 
 test<- merge(Grasslandpart1, Grassland1, by = "POINTID")
 
+## Calculating final score by subtracting part2 (Fcover_number) with part1 
+
 test$Final_number<- test$Fcover_number-test$Part1_number
 
 test<- test[!is.na(test$Final_number),]
@@ -1398,8 +1409,6 @@ Part1_part2_grassland_avg <- Part1_part2_grassland %>%
   group_by(Class) %>%
   summarise(across(where(is.numeric), ~mean(.x, na.rm = TRUE)))
 
-# Load necessary library
-
 
 # Specify the desired order of variables
 variable_order <- c(
@@ -1424,7 +1433,7 @@ data_long <- Part1_part2_grassland_avg %>%
                               first(Cumulative, order_by = Variable) - cumsum(Value[Variable != "Part2"]))) %>%
   ungroup()
 
-# Convert Class to a factor (ensures correct color mapping)
+# Convert Class to a factor 
 test$Class <- as.factor(test$Class)
 data_long$Class <- as.factor(data_long$Class)
 
@@ -1485,3 +1494,333 @@ ggplot(data_long, aes(x = Variable, y = Cumulative, color = Class, group = Class
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-5-3.png)<!-- -->
+
+## Cropland (Part2)
+
+``` r
+Cropland1$mean_dep_nhx<-(Cropland1$dep_nhx_2015+ Cropland1$dep_nhx_2016+Cropland1$dep_nhx_2017+Cropland1$dep_nhx_2018+Cropland1$dep_nhx_2019)/5
+
+Cropland1$mean_dep_noy<-(Cropland1$dep_noy_2015+ Cropland1$dep_noy_2016+Cropland1$dep_noy_2017+Cropland1$dep_noy_2018+Cropland1$dep_noy_2019)/5
+
+Cropland1$mean_nfer_crop_nh4<-(Cropland1$nfer_crop_nh4_2015+ Cropland1$nfer_crop_nh4_2016+Cropland1$nfer_crop_nh4_2017+
+                                 Cropland1$nfer_crop_nh4_2018+Cropland1$nfer_crop_nh4_2019)/5
+
+Cropland1$mean_nfer_crop_no3<-(Cropland1$nfer_crop_no3_2015_Kg_N_ha+ Cropland1$nfer_crop_no3_2016_Kg_N_ha+Cropland1$nfer_crop_no3_2017_Kg_N_ha+
+                                 Cropland1$nfer_crop_no3_2018_Kg_N_ha+Cropland1$nfer_crop_no3_2019_Kg_N_ha)/5
+
+Cropland1$mean_nmanure_app_crop<-(Cropland1$nmanure_app_crop_2015_Kg_N_ha+ Cropland1$nmanure_app_crop_2016_Kg_N_ha+Cropland1$nmanure_app_crop_2017_Kg_N_ha+
+                                    Cropland1$nmanure_app_crop_2018_Kg_N_ha+Cropland1$nmanure_app_crop_2019_Kg_N_ha)/5
+
+
+Cropland1$Sum_fer_manure<- Cropland1$mean_nfer_crop_nh4+Cropland1$mean_nfer_crop_no3+Cropland1$mean_nmanure_app_crop
+
+Cropland1$sum_fertilizer<- Cropland1$mean_nfer_crop_nh4+Cropland1$mean_nfer_crop_no3
+
+Cropland1$percent_fer_manure<- (Cropland1$sum_fertilizer/Cropland1$Sum_fer_manure)*100
+
+Cropland1$percent_manure<- (Cropland1$mean_nmanure_app_crop/Cropland1$Sum_fer_manure)*100
+
+ hist(Cropland1$percent_manure)
+```
+
+![](README_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
+``` r
+ Cropland2<- read.dbf("C:/Users/surya/Downloads/SHERPA_dataset/Datasets_Sherpa_11_feb/Cropland/Cropland_data.dbf")
+
+ colnames(Cropland2)
+```
+
+    ##  [1] "Field1"     "POINTID"    "OID_"       "Field1_1"   "Depth"     
+    ##  [6] "pH_CaCl2"   "pH_H2O"     "EC"         "OC"         "CaCO3"     
+    ## [11] "P"          "N"          "K"          "OC__20_30_" "CaCO3__20_"
+    ## [16] "Ox_Al"      "Ox_Fe"      "NUTS_0"     "NUTS_1"     "NUTS_2"    
+    ## [21] "NUTS_3"     "TH_LAT"     "TH_LONG"    "SURVEY_DAT" "Elev"      
+    ## [26] "LC"         "LC_X"       "LC_Y"       "LU"         "LC0_Desc"  
+    ## [31] "LC1_Desc"   "LU1_Desc"   "Landslide"  "Zinc"       "Antimony"  
+    ## [36] "Soil_erosi" "Lead"       "Nickel"     "Manganese"  "Mercury"   
+    ## [41] "Cobalt"     "Chromium"   "Copper"     "Cadmium"    "Arsenic"   
+    ## [46] "dep_nhx_20" "dep_nhx_21" "dep_nhx_22" "dep_nhx_23" "dep_nhx_24"
+    ## [51] "dep_noy_20" "dep_noy_21" "dep_noy_22" "dep_noy_23" "dep_noy_24"
+    ## [56] "nfer_crop_" "nfer_crop1" "nfer_cro_1" "nfer_cro_2" "nfer_cro_3"
+    ## [61] "nfer_cro_4" "nfer_cro_5" "nfer_cro_6" "nfer_cro_7" "nfer_cro_8"
+    ## [66] "nmanure_ap" "nmanure__1" "nmanure__2" "nmanure__3" "nmanure__4"
+    ## [71] "Miniral_P_" "Organic_P_" "P_export_g" "P_export_r" "mean_raste"
+    ## [76] "SE"         "textureUSD" "Stock_carb" "BD"         "LS"        
+    ## [81] "RS"         "AI"         "Fcover"
+
+``` r
+ Cropland2<- Cropland2[,c(2,76:83)]
+
+ Cropland1<- merge(Cropland1,Cropland2, by = "POINTID")
+
+ Cropland1$Fcover<- Cropland1$Fcover*100
+
+ Cropland1 <- Cropland1 %>%
+   mutate(Fcover_number = case_when(
+     Fcover >= 80 & Fcover <= 100 ~ 10,
+     Fcover < 80 & Fcover >= 75 ~ 9,
+     Fcover < 75 & Fcover >= 70 ~ 8,
+     Fcover < 70 & Fcover >= 65 ~ 7,
+     Fcover < 65 & Fcover >= 60 ~ 6,
+     Fcover < 60 & Fcover >= 55 ~ 5,
+     Fcover < 55 & Fcover >= 50 ~ 4,
+     Fcover < 50 & Fcover >= 45 ~ 3,
+     Fcover < 45 & Fcover >= 40 ~ 2,
+     Fcover < 40 ~ 1
+   ))
+
+ Cropland1 <- Cropland1 %>%
+   mutate(Fertilizer_type_number = case_when(
+     percent_manure == 100 ~ 10,  # Organic fertilizer only
+     percent_manure == 0 ~ 1,  # Mineral fertilizer only
+     percent_manure >= 95 & percent_manure <= 100 ~ 9,
+     percent_manure < 95 & percent_manure >= 80 ~ 8,
+     percent_manure < 80 & percent_manure >= 65 ~ 7,
+     percent_manure < 65 & percent_manure >= 50 ~ 6,
+     percent_manure < 50 & percent_manure >= 35 ~ 5,
+     percent_manure < 35 & percent_manure >= 20 ~ 4,
+     percent_manure < 20 & percent_manure >= 10 ~ 3,
+     percent_manure < 10 & percent_manure >= 0 ~ 2
+   ))
+
+Cropland1$Part2<- (Cropland1$Fcover_number+Cropland1$Fertilizer_type_number)/2
+
+All_data_BO<- read.csv("C:/Users/surya/Downloads/SHERPA_dataset/Cropl_land_Eur_reg1.csv")
+
+colnames(All_data_BO)
+```
+
+    ##   [1] "OBJECTID.." "Shape.."    "Join_Count" "TARGET_FID" "Field1"    
+    ##   [6] "POINTID"    "OID_"       "Field1_1"   "Depth"      "pH_CaCl2"  
+    ##  [11] "pH_H2O"     "EC"         "OC"         "CaCO3"      "P"         
+    ##  [16] "N"          "K"          "OC__20_30_" "CaCO3__20_" "Ox_Al"     
+    ##  [21] "Ox_Fe"      "NUTS_0"     "NUTS_1"     "NUTS_2"     "NUTS_3"    
+    ##  [26] "TH_LAT"     "TH_LONG"    "SURVEY_DAT" "Elev"       "LC"        
+    ##  [31] "LC_X"       "LC_Y"       "LU"         "LC0_Desc"   "LC1_Desc"  
+    ##  [36] "LU1_Desc"   "Landslide"  "Zinc"       "Antimony"   "Soil_erosi"
+    ##  [41] "Lead"       "Nickel"     "Manganese"  "Mercury"    "Cobalt"    
+    ##  [46] "Chromium"   "Copper"     "Cadmium"    "Arsenic"    "dep_nhx_20"
+    ##  [51] "dep_nhx_21" "dep_nhx_22" "dep_nhx_23" "dep_nhx_24" "dep_noy_20"
+    ##  [56] "dep_noy_21" "dep_noy_22" "dep_noy_23" "dep_noy_24" "nfer_crop_"
+    ##  [61] "nfer_crop1" "nfer_cro_1" "nfer_cro_2" "nfer_cro_3" "nfer_cro_4"
+    ##  [66] "nfer_cro_5" "nfer_cro_6" "nfer_cro_7" "nfer_cro_8" "nfer_pas_n"
+    ##  [71] "nfer_pas_1" "nfer_pas_2" "nfer_pas_3" "nfer_pas_4" "nfer_pas_5"
+    ##  [76] "nfer_pas_6" "nfer_pas_7" "nfer_pas_8" "nfer_pas_9" "nmanure_ap"
+    ##  [81] "nmanure__1" "nmanure__2" "nmanure__3" "nmanure__4" "nmanure__5"
+    ##  [86] "nmanure__6" "nmanure__7" "nmanure__8" "nmanure__9" "nmanure_de"
+    ##  [91] "nmanure_10" "nmanure_11" "nmanure_12" "nmanure_13" "Miniral_P_"
+    ##  [96] "Organic_P_" "P_export_g" "P_export_r" "Multiple_c" "Wind"      
+    ## [101] "mean_raste" "mean_ras_1" "Net_phopho" "Soil_ero_1" "Zinc_numbe"
+    ## [106] "Antimony_n" "Lead_numbe" "Nickel_num" "Mercury_nu" "Cobalt_num"
+    ## [111] "Chromium_n" "Copper_num" "Cadmium_nu" "Arsenic_nu" "EC_number" 
+    ## [116] "Nitrogen_n" "Phophorus_" "Part1_numb" "Code"       "Shape_Leng"
+    ## [121] "Class"
+
+``` r
+All_data_BO<- All_data_BO[,c(6,121)]
+
+Cropland_part1<- merge(Cropland4, All_data_BO, by="POINTID")
+
+
+Cropland7<- merge(Cropland_part1, Cropland1, by = "POINTID")
+
+
+Cropland7$Final_number<- Cropland7$Part2-Cropland7$Part1_number
+
+Cropland7<- Cropland7[!is.na(Cropland7$Final_number),]
+
+nrow(Cropland7)
+```
+
+    ## [1] 3644
+
+``` r
+Cropland7<- Cropland7[,c(1,105:125,239:240)]
+
+colnames(Cropland7)
+```
+
+    ##  [1] "POINTID"                 "Soil_erosion_number"    
+    ##  [3] "LS_number"               "Zinc_number"            
+    ##  [5] "Antimony_number"         "Lead_number"            
+    ##  [7] "Nickel_number"           "Mercury_number"         
+    ##  [9] "Cobalt_number"           "Chromium_number"        
+    ## [11] "Copper_number"           "Cadmium_number"         
+    ## [13] "Arsenic_number"          "EC_number"              
+    ## [15] "Nitrogen_number"         "Phophorus_number_excess"
+    ## [17] "Phophorus_number_mining" "Pesticide_Risk_Score"   
+    ## [19] "C_loss_score"            "Soil_bulk_density_score"
+    ## [21] "Part1_number"            "Class"                  
+    ## [23] "Part2"                   "Final_number"
+
+``` r
+old_names <- c(
+  "Soil_erosion_number", "LS_number", "Zinc_number", "Antimony_number", "Lead_number",
+  "Nickel_number", "Mercury_number", "Cobalt_number", "Chromium_number", "Copper_number",
+  "Cadmium_number", "Arsenic_number", "EC_number", "Nitrogen_number",
+  "Phophorus_number_excess", "Phophorus_number_mining", "Pesticide_Risk_Score", "C_loss_score",
+  "Soil_bulk_density_score", "Part1_number", "Final_number"
+)
+
+new_names <- c(
+  "Soil.erosion", "Landslide", "Zinc", "Antimony", "Lead",
+  "Nickel", "Mercury", "Cobalt", "Chromium", "Copper",
+  "Cadmium", "Arsenic", "Salinity", "Nitrogen.excess",
+  "Phophorus.excess", "Phophorus.mining", "Pesticide.risk", "Carbon.loss",
+  "Compaction", "Part1", "Final_number"
+)
+
+
+Cropland7 <- Cropland7 %>% rename(!!!setNames(old_names,new_names))
+
+colnames(Cropland7)
+```
+
+    ##  [1] "POINTID"          "Soil.erosion"     "Landslide"        "Zinc"            
+    ##  [5] "Antimony"         "Lead"             "Nickel"           "Mercury"         
+    ##  [9] "Cobalt"           "Chromium"         "Copper"           "Cadmium"         
+    ## [13] "Arsenic"          "Salinity"         "Nitrogen.excess"  "Phophorus.excess"
+    ## [17] "Phophorus.mining" "Pesticide.risk"   "Carbon.loss"      "Compaction"      
+    ## [21] "Part1"            "Class"            "Part2"            "Final_number"
+
+``` r
+Part1_part2_grassland <- Cropland7 %>%
+  mutate(Class = as.character(Class))  # Convert Class to character if needed
+
+#colnames(test)[which(colnames(test)%in% c("Fcover_number"))]<- "Part2"
+
+# Compute mean based on Class
+Part1_part2_grassland_avg <- Part1_part2_grassland %>%
+  group_by(Class) %>%
+  summarise(across(where(is.numeric), ~mean(.x, na.rm = TRUE)))
+
+summary(Part1_part2_grassland_avg)
+```
+
+    ##     Class              POINTID          Soil.erosion     Landslide      
+    ##  Length:4           Min.   :35084657   Min.   :2.546   Min.   :0.00000  
+    ##  Class :character   1st Qu.:37732522   1st Qu.:3.484   1st Qu.:0.01469  
+    ##  Mode  :character   Median :43827592   Median :3.813   Median :0.03199  
+    ##                     Mean   :43480208   Mean   :3.770   Mean   :0.03887  
+    ##                     3rd Qu.:49575278   3rd Qu.:4.100   3rd Qu.:0.05617  
+    ##                     Max.   :51180992   Max.   :4.906   Max.   :0.09152  
+    ##       Zinc           Antimony             Lead             Nickel     
+    ##  Min.   :0.3690   Min.   :0.007380   Min.   :0.00369   Min.   :1.624  
+    ##  1st Qu.:0.6326   1st Qu.:0.008524   1st Qu.:0.01294   1st Qu.:1.659  
+    ##  Median :0.8170   Median :0.032781   Median :0.03446   Median :1.830  
+    ##  Mean   :0.7472   Mean   :0.053500   Mean   :0.05829   Mean   :1.955  
+    ##  3rd Qu.:0.9317   3rd Qu.:0.077757   3rd Qu.:0.07980   3rd Qu.:2.126  
+    ##  Max.   :0.9858   Max.   :0.141058   Max.   :0.16053   Max.   :2.539  
+    ##     Mercury           Cobalt             Chromium     Copper      
+    ##  Min.   :0.2779   Min.   :0.0000000   Min.   :0   Min.   :0.0369  
+    ##  1st Qu.:0.3490   1st Qu.:0.0000000   1st Qu.:0   1st Qu.:0.1445  
+    ##  Median :0.4308   Median :0.0004198   Median :0   Median :0.2594  
+    ##  Mean   :0.4334   Mean   :0.0006551   Mean   :0   Mean   :0.2604  
+    ##  3rd Qu.:0.5151   3rd Qu.:0.0010750   3rd Qu.:0   3rd Qu.:0.3753  
+    ##  Max.   :0.5940   Max.   :0.0017809   Max.   :0   Max.   :0.4861  
+    ##     Cadmium            Arsenic     Salinity       Nitrogen.excess
+    ##  Min.   :0.009236   Min.   :0   Min.   :0.00000   Min.   :7.022  
+    ##  1st Qu.:0.154523   1st Qu.:0   1st Qu.:0.00000   1st Qu.:8.038  
+    ##  Median :0.239814   Median :0   Median :0.00000   Median :8.406  
+    ##  Mean   :0.282724   Mean   :0   Mean   :0.01322   Mean   :8.167  
+    ##  3rd Qu.:0.368015   3rd Qu.:0   3rd Qu.:0.01322   3rd Qu.:8.535  
+    ##  Max.   :0.642030   Max.   :0   Max.   :0.05290   Max.   :8.831  
+    ##  Phophorus.excess Phophorus.mining Pesticide.risk   Carbon.loss    
+    ##  Min.   :1.280    Min.   :0.1411   Min.   :2.742   Min.   :0.5345  
+    ##  1st Qu.:2.191    1st Qu.:0.1598   1st Qu.:5.458   1st Qu.:0.5637  
+    ##  Median :2.742    Median :0.2544   Median :6.633   Median :0.6314  
+    ##  Mean   :2.846    Mean   :0.5369   Mean   :5.924   Mean   :0.6781  
+    ##  3rd Qu.:3.397    3rd Qu.:0.6315   3rd Qu.:7.099   3rd Qu.:0.7458  
+    ##  Max.   :4.620    Max.   :1.4976   Max.   :7.689   Max.   :0.9151  
+    ##    Compaction         Part1           Part2        Final_number   
+    ##  Min.   :0.2057   Min.   :19.47   Min.   :2.471   Min.   :-28.71  
+    ##  1st Qu.:0.4084   1st Qu.:25.19   1st Qu.:2.739   1st Qu.:-25.42  
+    ##  Median :0.4798   Median :27.12   Median :2.950   Median :-23.96  
+    ##  Mean   :0.4599   Mean   :26.23   Mean   :2.968   Mean   :-23.26  
+    ##  3rd Qu.:0.5313   3rd Qu.:28.16   3rd Qu.:3.179   3rd Qu.:-21.79  
+    ##  Max.   :0.6742   Max.   :31.18   Max.   :3.501   Max.   :-16.40
+
+``` r
+variable_order <- c(
+  "Part2","Soil.erosion","Landslide", "Compaction", "Nitrogen.excess",
+  "Phophorus.excess","Phophorus.mining", "Carbon.loss", "Pesticide.risk", "Salinity", "Zinc",
+  "Antimony", "Lead", "Nickel", "Mercury",
+  "Cobalt", "Chromium", "Copper", "Cadmium",
+  "Arsenic"
+)
+
+data_long <- Part1_part2_grassland_avg %>%
+  dplyr::select(all_of(c("Class", variable_order))) %>%  # Select required variables
+  pivot_longer(cols = -Class,
+               names_to = "Variable",
+               values_to = "Value") %>%
+  mutate(Variable = factor(Variable, levels = variable_order)) %>%  # Order variables
+  group_by(Class) %>%
+  arrange(Class, Variable) %>%  # Ensure correct order for cumulative calculation
+  mutate(Cumulative = if_else(Variable == "Part2", Value, NA_real_)) %>%  # Initialize Cumulative
+  mutate(Cumulative = replace(Cumulative, is.na(Cumulative),
+                              first(Cumulative, order_by = Variable) - cumsum(Value[Variable != "Part2"]))) %>%
+  ungroup()
+
+# Convert Class to a factor (ensures correct color mapping)
+  Cropland7$Class <- as.factor(Cropland7$Class)
+  data_long$Class <- as.factor(data_long$Class)
+  
+# Define custom colors (Make sure these match actual class names)
+# Define custom colors based on the figure colors
+class_colors <- c("#7fbf4d","#d864a6","#ffbf33","#4a98c9") 
+
+ # Histogram Plot
+  ggplot(Cropland7, aes(x = Final_number, fill = Class)) +
+    geom_histogram(binwidth = 2, alpha = 0.6, position = "stack") +
+    labs(title = "Histogram of Final Score (Cropland)",
+         x = "Final SHERPA Score",
+         y = "Count") +
+    scale_fill_manual(values = class_colors) +  # Apply color mapping
+    theme_minimal(base_size = 16) +
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1, size = 16, color = "black"),
+    axis.text.y = element_text(size = 16, color = "black"),
+    axis.title.x = element_text(size = 16, face = "bold"),
+    axis.title.y = element_text(size = 16, face = "bold"),
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    panel.grid.major = element_line(color = "gray80"),
+    panel.grid.minor = element_blank(),
+    legend.position = "top",
+    legend.title = element_text(size = 16, face = "bold"),
+    legend.text = element_text(size = 16)
+  )
+```
+
+![](README_files/figure-gfm/unnamed-chunk-6-2.png)<!-- -->
+
+``` r
+# Line Plot
+ggplot(data_long, aes(x = Variable, y = Cumulative, color = Class, group = Class)) +
+  geom_line(size = 1.2) +
+  geom_point(size = 3) +
+  scale_y_continuous(limits = c(-30, 10)) +
+  scale_color_manual(values = class_colors) +  # Apply color mapping
+  labs(
+    title = "Cumulative Reductions (Cropland)",
+    x = "Variable",
+    y = "Cumulative Reduction",
+    color = "Class"
+  ) +
+  theme_minimal(base_size = 16) +
+  theme(
+   axis.text.x = element_text(angle = 45, hjust = 1, size = 16, color = "black"),
+    axis.text.y = element_text(size = 16, color = "black"),
+    axis.title.x = element_text(size = 16, face = "bold"),
+    axis.title.y = element_text(size = 16, face = "bold"),
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    panel.grid.major = element_line(color = "gray80"),
+    panel.grid.minor = element_blank(),
+    legend.position = "top",
+    legend.title = element_text(size = 16, face = "bold"),
+    legend.text = element_text(size = 16)
+  )
+```
+
+![](README_files/figure-gfm/unnamed-chunk-6-3.png)<!-- -->
