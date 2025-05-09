@@ -1141,22 +1141,6 @@ Grassland4<-Grassland4 %>% mutate(Phophorus_number_excess =
                                     )
 )
 
-######################################Pesticide
-
-Grassland4 <- Grassland4 %>%
-  mutate(Pesticide_Risk_Score = case_when(
-    RS <= 0 & AI == 0 ~ 0,  # Negligible risk, no active ingredient
-    RS <= 0 & AI >= 0 ~ 1, 
-    RS > 0 & RS <= 1 & AI >= 0 & AI <= 10 ~ 2,# Negligible risk, some active ingredient
-    RS > 1 & RS <= 2 & AI > 1 & AI <= 10 ~ 3,  # Medium-low risk, AI between 1-10
-    RS > 1 & RS <= 2 & AI > 10 & AI <= 20 ~ 4, # Medium-low risk, AI between 10-20
-    RS > 2 & RS <= 3 & AI > 1 & AI <= 10 ~ 5,  # Medium risk, AI between 1-10
-    RS > 2 & RS <= 3 & AI > 10 & AI <= 20 ~ 6, # Medium risk, AI between 10-20
-    RS > 3 & RS <= 4 & AI > 1 & AI <= 10 ~ 7,  # High risk, AI between 1-10
-    RS > 3 & RS <= 4 & AI > 10 & AI <= 20 ~ 8, # High risk, AI between 10-20
-    RS > 4 & AI > 10 ~ 9,  # Very high risk, AI greater than 10
-    TRUE ~ NA_real_  # Assign NA for unclassified cases
-  ))
 
 ###################################SOC loss
 
@@ -1198,10 +1182,10 @@ Grassland4 <- Grassland4 %>%
 
 ########################################################
 
- Grassland4$Part1_number<- Grassland4$Phophorus_number+Grassland4$Nitrogen_number+Grassland4$EC_number+Grassland4$Arsenic_number+Grassland4$Cadmium_number+
-   Grassland4$Copper_number+Grassland4$Chromium_number+Grassland4$Cobalt_number+Grassland4$Mercury_number+Grassland4$Nickel_number+Grassland4$Lead_number+Grassland4$Antimony_number+
-  Grassland4$Zinc_number+Grassland4$Soil_erosion_number+Grassland4$Soil_bulk_density_score+Grassland4$C_loss_score+Grassland4$Pesticide_Risk_Score+
-   Grassland4$LS_number
+Grassland4$Part1_number<- Grassland4$Phophorus_number+Grassland4$Nitrogen_number+Grassland4$EC_number+Grassland4$Arsenic_number+Grassland4$Cadmium_number+
+  Grassland4$Copper_number+Grassland4$Chromium_number+Grassland4$Cobalt_number+Grassland4$Mercury_number+Grassland4$Nickel_number+Grassland4$Lead_number+Grassland4$Antimony_number+
+  Grassland4$Zinc_number+Grassland4$Soil_erosion_number+Grassland4$Soil_bulk_density_score+Grassland4$C_loss_score+
+  Grassland4$LS_number
 
 Grassland4<- Grassland4[!is.na(Grassland4$Part1_number),]
 
@@ -1314,28 +1298,33 @@ test<- test[!is.na(test$Final_number),]
 nrow(test)
 ```
 
-    ## [1] 464
+    ## [1] 477
 
 ``` r
-test<- read.csv("C:/Users/surya/Downloads/SHERPA_dataset/Datasets_Sherpa_11_feb/Grassland_part1_part2_464.csv")
+############test1
+test<- test[,c(1,22,23,79:97, 199:200)]
 
-colnames(test)
-```
+old_names <- c(
+  "Soil_erosion_number", "LS_number", "Zinc_number", "Antimony_number", "Lead_number", 
+  "Nickel_number", "Mercury_number", "Cobalt_number", "Chromium_number", "Copper_number", 
+  "Cadmium_number", "Arsenic_number", "EC_number", "Nitrogen_number", 
+  "Phophorus_number_excess", "C_loss_score", 
+  "Soil_bulk_density_score", "Part1_number", "Fcover_number", "Final_number"
+)
 
-    ##  [1] "POINTID"            "TH_LAT"             "TH_LONG"           
-    ##  [4] "Soil.erosion"       "Landslide"          "Zinc"              
-    ##  [7] "Antimony"           "Lead"               "Nickel"            
-    ## [10] "Mercury"            "Cobalt"             "Chromium"          
-    ## [13] "Copper"             "Cadmium"            "Arsenic"           
-    ## [16] "Salinity"           "Nitrogen.excess"    "Phophorus.excess"  
-    ## [19] "Pesticide.risk"     "Carbon.loss"        "Compaction"        
-    ## [22] "Part1"              "Part2"              "Final_SHERPA_score"
-    ## [25] "Class"
+new_names <- c(
+  "Soil.erosion", "Landslide", "Zinc", "Antimony", "Lead",
+  "Nickel", "Mercury", "Cobalt", "Chromium", "Copper",
+  "Cadmium", "Arsenic", "Salinity", "Nitrogen.excess",
+  "Phophorus.excess", "Carbon.loss",
+  "Compaction", "Part1", "Part2", "Final_number"
+)
 
-``` r
-colnames(test)[which(colnames(test)%in% c("Class"))]<- "Class1"
 
-test<- merge(test, All_data_BO, by = "POINTID")
+test <- test %>% rename(!!!setNames(old_names,new_names))
+
+#write.csv(test, "C:/Users/surya/Downloads/SHERPA_dataset/Forest_data_477.csv")
+
 
 Part1_part2_grassland <- test %>%
   mutate(Class = as.character(Class))  # Convert Class to character if needed
@@ -1348,7 +1337,7 @@ Part1_part2_grassland_avg <- Part1_part2_grassland %>%
 # Specify the desired order of variables
 variable_order <- c(
   "Part2","Soil.erosion","Landslide", "Compaction", "Nitrogen.excess",
-  "Phophorus.excess", "Carbon.loss", "Pesticide.risk", "Salinity", "Zinc",
+  "Phophorus.excess", "Carbon.loss", "Salinity", "Zinc",
   "Antimony", "Lead", "Nickel", "Mercury",
   "Cobalt", "Chromium", "Copper", "Cadmium",
   "Arsenic"
@@ -1368,6 +1357,8 @@ data_long <- Part1_part2_grassland_avg %>%
                               first(Cumulative, order_by = Variable) - cumsum(Value[Variable != "Part2"]))) %>%
   ungroup()
 
+write.csv(data_long,"C:/Users/surya/Downloads/SHERPA_dataset/data_Grassland_diff_European zone.csv" )
+
 # Convert Class to a factor 
 test$Class <- as.factor(test$Class)
 data_long$Class <- as.factor(data_long$Class)
@@ -1377,7 +1368,7 @@ data_long$Class <- as.factor(data_long$Class)
 class_colors <- c("#7fbf4d","#d864a6","#ffbf33","#4a98c9") 
 
 # Histogram Plot
-ggplot(test, aes(x = Final_SHERPA_score, fill = Class)) +
+ggplot(test, aes(x = Final_number, fill = Class)) +
   geom_histogram(binwidth = 2, alpha = 0.6, position = "stack") +
   labs(title = "Histogram of Final Score (Grassland)",
        x = "Final SHERPA Score",
