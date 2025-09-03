@@ -6,12 +6,12 @@ Antonia Kaiser,Nima Shokri, Simon Scheper, Miriam Gross-Schmölders,
 David Robinson, GrantCampbell, Cezary Kabala, Friederike Lang, Nancy
 Dise, Panos Panagos, Pasquale Borrelli
 
-- [Cropland (Part1)](#cropland-part1)
 - [Cropland (Part2)](#cropland-part2)
-- [Grassland (Part1)](#grassland-part1)
+- [Cropland (Part1)](#cropland-part1)
 - [Grassland (Part2)](#grassland-part2)
-- [Forest (Part1)](#forest-part1)
+- [Grassland (Part1)](#grassland-part1)
 - [Forest (Part2)](#forest-part2)
+- [Forest (Part1)](#forest-part1)
 
 We introduce SHERPA (Soil Health Evaluation, Rating Protocol, and
 Assessment) as a framework and present a first assessment across Europe.
@@ -29,38 +29,6 @@ The maps used for part1 and part2 can be found here
 library(readxl)
 library(tidyr)
 library(plyr)
-library(rgdal)
-```
-
-    ## Loading required package: sp
-
-    ## The legacy packages maptools, rgdal, and rgeos, underpinning the sp package,
-    ## which was just loaded, will retire in October 2023.
-    ## Please refer to R-spatial evolution reports for details, especially
-    ## https://r-spatial.org/r/2023/05/15/evolution4.html.
-    ## It may be desirable to make the sf package available;
-    ## package maintainers should consider adding sf to Suggests:.
-    ## The sp package is now running under evolution status 2
-    ##      (status 2 uses the sf package in place of rgdal)
-
-    ## Please note that rgdal will be retired during October 2023,
-    ## plan transition to sf/stars/terra functions using GDAL and PROJ
-    ## at your earliest convenience.
-    ## See https://r-spatial.org/r/2023/05/15/evolution4.html and https://github.com/r-spatial/evolution
-    ## rgdal: version: 1.6-7, (SVN revision 1203)
-    ## Geospatial Data Abstraction Library extensions to R successfully loaded
-    ## Loaded GDAL runtime: GDAL 3.6.2, released 2023/01/02
-    ## Path to GDAL shared files: C:/Users/surya/AppData/Local/R/win-library/4.3/rgdal/gdal
-    ##  GDAL does not use iconv for recoding strings.
-    ## GDAL binary built with GEOS: TRUE 
-    ## Loaded PROJ runtime: Rel. 9.2.0, March 1st, 2023, [PJ_VERSION: 920]
-    ## Path to PROJ shared files: C:/Users/surya/AppData/Local/R/win-library/4.3/rgdal/proj
-    ## PROJ CDN enabled: FALSE
-    ## Linking to sp version:2.0-0
-    ## To mute warnings of possible GDAL/OSR exportToProj4() degradation,
-    ## use options("rgdal_show_exportToProj4_warnings"="none") before loading sp or rgdal.
-
-``` r
 library(dplyr)
 ```
 
@@ -84,6 +52,8 @@ library(dplyr)
 library(raster)
 ```
 
+    ## Loading required package: sp
+
     ## 
     ## Attaching package: 'raster'
 
@@ -96,14 +66,10 @@ library(ranger)
 library(terra)
 ```
 
-    ## terra 1.7.39
+    ## terra 1.8.54
 
     ## 
     ## Attaching package: 'terra'
-
-    ## The following object is masked from 'package:rgdal':
-    ## 
-    ##     project
 
     ## The following object is masked from 'package:tidyr':
     ## 
@@ -126,9 +92,9 @@ library(tidyverse)
 ```
 
     ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-    ## ✔ forcats   1.0.0     ✔ readr     2.1.4
-    ## ✔ lubridate 1.9.2     ✔ stringr   1.5.0
-    ## ✔ purrr     1.0.1     ✔ tibble    3.2.1
+    ## ✔ forcats   1.0.0     ✔ readr     2.1.5
+    ## ✔ lubridate 1.9.4     ✔ stringr   1.5.1
+    ## ✔ purrr     1.0.4     ✔ tibble    3.2.1
 
     ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
     ## ✖ dplyr::arrange()   masks plyr::arrange()
@@ -269,14 +235,14 @@ Grassland<- LUCAS_final[LUCAS_final$LC0_Desc=="Grassland",]
 Forestland<- LUCAS_final[LUCAS_final$LC0_Desc=="Woodland",]
 ```
 
-## Cropland (Part1)
+## Cropland (Part2)
 
 ``` r
 Cropland1<- cropland[,c(1:95)]
 
 Cropland2<- read.dbf("C:/Users/surya/Downloads/SHERPA_dataset/Datasets_Sherpa_11_feb/Cropland/Cropland_data.dbf")
 
-Cropland2<- Cropland2[,c(2,76:82)]
+Cropland2<- Cropland2[,c(2,76:82,84,85)]
 
 Cropland3<- merge(Cropland1,Cropland2, by = "POINTID")
 
@@ -423,18 +389,18 @@ Cropland3<-Cropland3 %>% mutate(Cobalt_number =
 
 
 Cropland3<-Cropland3 %>% mutate(Chromium_number =
-                                    case_when(Chromium == -9999 ~ NA_real_,
-                                              Chromium>= 0 &  Chromium<=70 ~ 0, 
-                                              Chromium> 70 &  Chromium<=25 ~ 1,
-                                              Chromium> 90 & Chromium<=30~ 2,
-                                              Chromium> 110 &  Chromium<=35 ~ 3,
-                                              Chromium> 130 &  Chromium<=40 ~ 4,
-                                              Chromium> 155 &  Chromium<=45 ~ 5,
-                                              Chromium> 180 &  Chromium<=50 ~ 6,
-                                              Chromium> 205 &  Chromium<=55 ~ 7,
-                                              Chromium> 230 &  Chromium<=60 ~ 8,
-                                              Chromium> 250 ~ 9
-                                    )
+                                  case_when(Chromium == -9999 ~ NA_real_,
+                                            Chromium>= 0 &  Chromium<=70 ~ 0, 
+                                            Chromium> 70 &  Chromium<=90 ~ 1,
+                                            Chromium> 90 & Chromium<=110~ 2,
+                                            Chromium> 110 &  Chromium<=130 ~ 3,
+                                            Chromium> 130 &  Chromium<=155 ~ 4,
+                                            Chromium> 155 &  Chromium<=180 ~ 5,
+                                            Chromium> 180 &  Chromium<=205 ~ 6,
+                                            Chromium> 205 &  Chromium<=230 ~ 7,
+                                            Chromium> 230 &  Chromium<=250 ~ 8,
+                                            Chromium> 250 ~ 9
+                                  )
 )
 
 Cropland3<-Cropland3 %>% mutate(Copper_number =
@@ -574,21 +540,109 @@ Cropland3 <- Cropland3 %>%
 
 ###################################SOC loss
 
-Cropland3 <- Cropland3 %>% 
-  mutate(C_loss_score = case_when(
-    Stock_carb == -9999 ~ NA_real_,                    # If value is -9999, assign NA
-    Stock_carb >= 0 ~ 0,                                # 0 to positive (e.g., SOC accumulation)
-    Stock_carb > -0.5 & Stock_carb <= 0 ~ 1,            # < 0 to -0.5
-    Stock_carb > -1.5 & Stock_carb <= -0.5 ~ 2,         # < -0.5 to -1.5
-    Stock_carb > -3 & Stock_carb <= -1.5 ~ 3,           # < -1.5 to -3
-    Stock_carb > -4 & Stock_carb <= -3 ~ 4,             # < -3 to -4
-    Stock_carb > -5 & Stock_carb <= -4 ~ 5,             # < -4 to -5
-    Stock_carb > -6 & Stock_carb <= -5 ~ 6,             # < -5 to -6
-    Stock_carb > -7 & Stock_carb <= -6 ~ 7,             # < -6 to -7
-    Stock_carb > -8 & Stock_carb <= -7 ~ 8,             # < -7 to -8
-    Stock_carb < -8 ~ 9                                # < -8
+Cropland3$OC1<- Cropland3$OC/10
+
+Cropland3 <- Cropland3 %>%
+  mutate(
+    Stock_carb = ifelse(Stock_carb == -9999, NA, Stock_carb),
+    OC1 = ifelse(OC1 == -9999, NA, OC1),
+    
+    SOC_score_loss1 = case_when(
+      # Stable or increasing SOC
+      Stock_carb >= 0 & OC1 >= 5                   ~ 0,
+      Stock_carb >= 0 & OC1 >= 2.5 & OC1 < 5  ~ 0,
+      Stock_carb >= 0 & OC1 >= 1   & OC1 < 2.5 ~ 0,
+      Stock_carb >= 0 & OC1 >= 0.5 & OC1 < 1   ~ 0,
+      
+      # Loss <0 to -0.5
+      Stock_carb < 0   & Stock_carb >= -0.5 & OC1 >= 5                   ~ 1,
+      Stock_carb < 0   & Stock_carb >= -0.5 & OC1>= 2.5 & OC1 < 5  ~ 2,
+      Stock_carb < 0   & Stock_carb >= -0.5 & OC1 >= 1   & OC1 < 2.5 ~ 4,
+      Stock_carb < 0   & Stock_carb >= -0.5 & OC1 >= 0.5 & OC1 < 1   ~ 6,
+      
+      # Loss < -0.5 to -1.5
+      Stock_carb < -0.5 & Stock_carb >= -1.5 & OC1 >= 5                   ~ 2,
+      Stock_carb < -0.5 & Stock_carb >= -1.5 & OC1 >= 2.5 & OC1 < 5  ~ 3,
+      Stock_carb < -0.5 & Stock_carb >= -1.5 & OC1 >= 1   & OC1 < 2.5 ~ 5,
+      Stock_carb < -0.5 & Stock_carb >= -1.5 & OC1 >= 0.5 & OC1 < 1   ~ 7,
+      
+      # Loss < -1.5 to -3
+      Stock_carb < -1.5 & Stock_carb >= -3 & OC1 >= 5                   ~ 3,
+      Stock_carb < -1.5 & Stock_carb >= -3 & OC1 >= 2.5 & OC1 < 5  ~ 4,
+      Stock_carb < -1.5 & Stock_carb >= -3 & OC1 >= 1   & OC1 < 2.5 ~ 6,
+      Stock_carb < -1.5 & Stock_carb >= -3 & OC1 >= 0.5 & OC1 < 1   ~ 8,
+      
+      # Loss < -3 to -4
+      Stock_carb < -3 & Stock_carb >= -4 & OC1 >= 5                   ~ 4,
+      Stock_carb < -3 & Stock_carb >= -4 & OC1 >= 2.5 & OC1 < 5  ~ 5,
+      Stock_carb < -3 & Stock_carb >= -4 & OC1 >= 1   & OC1 < 2.5 ~ 7,
+      Stock_carb < -3 & Stock_carb >= -4 & OC1 >= 0.5 & OC1 < 1   ~ 9,
+      
+      # Loss < -4 to -5
+      Stock_carb < -4 & Stock_carb >= -5 & OC1 >= 5                   ~ 5,
+      Stock_carb < -4 & Stock_carb >= -5 & OC1 >= 2.5 & OC1 < 5  ~ 6,
+      Stock_carb < -4 & Stock_carb >= -5 & OC1 >= 1   & OC1 < 2.5 ~ 8,
+      Stock_carb < -4 & Stock_carb >= -5 & OC1 >= 0.5 & OC1 < 1   ~ 9,
+      
+      # Loss < -5 to -6
+      Stock_carb < -5 & Stock_carb >= -6 & OC1 >= 5                   ~ 6,
+      Stock_carb < -5 & Stock_carb >= -6 & OC1 >= 2.5 & OC1 < 5  ~ 7,
+      Stock_carb < -5 & Stock_carb >= -6 & OC1 >= 1   & OC1 < 2.5 ~ 9,
+      Stock_carb < -5 & Stock_carb >= -6 & OC1 >= 0.5 & OC1 < 1   ~ 9,
+      
+      # Loss < -6 to -7
+      Stock_carb < -6 & Stock_carb >= -7 & OC1 >= 5                   ~ 7,
+      Stock_carb < -6 & Stock_carb >= -7 & OC1 >= 2.5 & OC1 < 5  ~ 8,
+      Stock_carb < -6 & Stock_carb >= -7 & OC1 >= 1   & OC1 < 2.5 ~ 9,
+      Stock_carb < -6 & Stock_carb >= -7 & OC1 >= 0.5 & OC1 < 1   ~ 9,
+      
+      # Loss < -7 to -8
+      Stock_carb < -7 & Stock_carb >= -8 & OC1 >= 5                   ~ 8,
+      Stock_carb < -7 & Stock_carb >= -8 & OC1 >= 2.5 & OC1 < 5  ~ 9,
+      Stock_carb < -7 & Stock_carb >= -8 & OC1 >= 1   & OC1 < 2.5 ~ 9,
+      Stock_carb < -7 & Stock_carb >= -8 & OC1 >= 0.5 & OC1 < 1   ~ 9,
+      
+      # Loss < -8
+      Stock_carb < -8 & OC1 >= 5                   ~ 9,
+      Stock_carb < -8 & OC1 >= 2.5 & OC1 < 5  ~ 9,
+      Stock_carb < -8 & OC1 >= 1   & OC1 < 2.5 ~ 9,
+      Stock_carb < -8 & OC1 >= 0.5 & OC1 < 1   ~ 9,
+      
+      TRUE ~ NA_real_
+    )
+  )
+Cropland3$SOC_clay_ratio<- (Cropland3$OC1/Cropland3$Clay)
+
+Cropland3 <- Cropland3 %>%
+  mutate(SOC_clay_raio_number = case_when(
+    SOC_clay_ratio == -9999 ~ NA_real_,                 
+    SOC_clay_ratio >= 0.125 ~ 0,                        
+    SOC_clay_ratio < 0.125 & SOC_clay_ratio >= 0.111 ~ 1,  
+    SOC_clay_ratio < 0.111 & SOC_clay_ratio >= 0.1   ~ 3,  
+    SOC_clay_ratio < 0.1   & SOC_clay_ratio >= 0.090 ~ 5,  
+    SOC_clay_ratio < 0.090 & SOC_clay_ratio >= 0.0833 ~ 7, 
+    SOC_clay_ratio < 0.0833 & SOC_clay_ratio >= 0.077 ~ 8, 
+    SOC_clay_ratio < 0.077 ~ 9                          
   ))
 
+Cropland3 <- Cropland3 %>%
+  mutate(SOC_score2 = case_when(
+    OC1 > 5               ~ 0,
+    OC1 > 4.5 & OC1 <= 5  ~ 1,
+    OC1 > 4   & OC1 <= 4.5  ~ 2,
+    OC1 > 3.5 & OC1 <= 4    ~ 3,
+    OC1 > 3   & OC1 <= 3.5  ~ 4,
+    OC1 > 2.5 & OC1 <= 3    ~ 5,
+    OC1 > 2   & OC1 <= 2.5  ~ 6,
+    OC1 > 1.5 & OC1 <= 2    ~ 7,
+    OC1 > 0.5 & OC1 <= 1.5  ~ 8,
+    OC1 <= 0.5                     ~ 9,
+    TRUE                                ~ NA_real_  
+  ))
+
+#Grassland4$soc_final_number<- (Grassland4$SOC_clay_raio_number + Grassland4$SOC_score2)/2
+
+Cropland3$soc_final_number<- (Cropland3$SOC_clay_raio_number + Cropland3$SOC_score2+Cropland3$SOC_score_loss1)/3
 
 #########################################compaction
 
@@ -609,42 +663,57 @@ Cropland3 <- Cropland3 %>%
     TRUE ~ NA_real_  # Assign NA for unrecognized texture names
   ))
 
-Cropland4<- Cropland3
 
-Cropland4$Part1_number<- Cropland4$Nitrogen_number+Cropland4$EC_number+Cropland4$Arsenic_number+Cropland4$Cadmium_number+
-  Cropland4$Copper_number+Cropland4$Chromium_number+Cropland4$Cobalt_number+Cropland4$Mercury_number+Cropland4$Nickel_number+Cropland4$Lead_number+Cropland4$Antimony_number+Cropland4$Zinc_number+Cropland4$Soil_erosion_number+Cropland4$Phophorus_number_excess+Cropland4$Phophorus_number_mining+Cropland4$Soil_bulk_density_score+
-  Cropland4$Pesticide_Risk_Score+Cropland4$LS_number+Cropland4$C_loss_score
+Cropland3$Part1_number<- Cropland3$Nitrogen_number+Cropland3$EC_number+Cropland3$Arsenic_number+Cropland3$Cadmium_number+
+  Cropland3$Copper_number+Cropland3$Chromium_number+Cropland3$Cobalt_number+Cropland3$Mercury_number+Cropland3$Nickel_number+Cropland3$Lead_number+Cropland3$Antimony_number+
+  Cropland3$Zinc_number+Cropland3$Soil_erosion_number+Cropland3$Phophorus_number_excess+Cropland3$Phophorus_number_mining+Cropland3$Soil_bulk_density_score+
+  Cropland3$Pesticide_Risk_Score+Cropland3$LS_number+Cropland3$soc_final_number
 
-Cropland4<- Cropland4[!is.na(Cropland4$Part1_number),]
+Cropland3<- Cropland3[!is.na(Cropland3$Part1_number),]
 
-hist(Cropland4$Part1_number)
+Cropland3$Part1_number_avg<- (Cropland3$Part1_number)/19
+
+hist(Cropland3$Part1_number_avg)
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
 
 ``` r
-## Regional variability in Part1 scores across Europe
+## Regional variability in Part2 scores across Europe and comparison with Panagos et al. (2024) soil degradation process data (see Figure S2.1 in SI2 document)
 
 All_data_BO<- read.csv("C:/Users/surya/Downloads/SHERPA_dataset/Cropl_land_Eur_reg1.csv")
 
 All_data_BO<- All_data_BO[,c(6,121)]
 
-All_data_BO<- merge(Cropland4, All_data_BO, by = "POINTID")
+colnames(All_data_BO)
+```
+
+    ## [1] "POINTID" "Class"
+
+``` r
+All_data_BO<- merge(Cropland3, All_data_BO, by = "POINTID")
+
+All_data_BO<- All_data_BO[All_data_BO$Sum_data_1<126,]
+
+All_data_BO<- All_data_BO[All_data_BO$Sum_data_1>-1,]
+
+counts <- All_data_BO %>%
+  group_by(Class) %>%
+  summarise(Count = n())
+
+All_data_BO$part22<- 0-All_data_BO$Part1_number_avg
+
+my_colors <- c(
+  c("#7fbf4d","#d864a6","#ffbf33","#4a98c9") 
+)
 
 level_order <- c('Northern', 'Western', 'Cent_Eastern', 'Southern') 
 
-my_colors <- c(
-  "Northern" = "#0000FF", # Orange
-  "Western" = "#800080", # Blue
-  "Cent_Eastern" = "#FF0000", # Green
-  "Southern" = "#90EE90"  # Yellow
-)
-
-p <- ggplot(All_data_BO, aes(x = factor(Class, level = level_order), y = Part1_number, fill = Class)) + 
+p <- ggplot(All_data_BO, aes(x = factor(Class, level = level_order), y = part22, fill = Class)) + 
   geom_boxplot(outlier.shape = NA, width = 0.6, alpha = 0.7, position = position_dodge(width = 0.75)) +  # Separate boxplots
-    # Separate points
+  # Separate points
   labs(x = "European region [-]",
-       y = "Part1_Number [-]") +  # Add title
+       y = "Part2_Number [-]") +  # Add title
   theme_minimal(base_size = 15) +  # Clean background
   theme(
     axis.text = element_text(size = 18),
@@ -654,7 +723,7 @@ p <- ggplot(All_data_BO, aes(x = factor(Class, level = level_order), y = Part1_n
     legend.text = element_text(size = 18),
     legend.title = element_text(size = 18)
   ) +
-  scale_y_continuous(limits = c(0, 50), expand = c(0, 0)) +  # Set limits and remove extra space
+  scale_y_reverse(limits = c(0, -5), expand = c(0, 0)) +  # Set limits and remove extra space
   scale_fill_manual(values = my_colors) +  # Apply custom colors to fill
   scale_color_manual(values = my_colors)  # Apply custom colors to points
 
@@ -663,7 +732,7 @@ print(p)
 
 ![](README_files/figure-gfm/unnamed-chunk-2-2.png)<!-- -->
 
-## Cropland (Part2)
+## Cropland (Part1)
 
 ``` r
 Cropland1$mean_dep_nhx<-(Cropland1$dep_nhx_2015+ Cropland1$dep_nhx_2016+Cropland1$dep_nhx_2017+Cropland1$dep_nhx_2018+Cropland1$dep_nhx_2019)/5
@@ -694,27 +763,27 @@ Cropland1$percent_manure<- (Cropland1$mean_nmanure_app_crop/Cropland1$Sum_fer_ma
 ![](README_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
 
 ``` r
- Cropland2<- read.dbf("C:/Users/surya/Downloads/SHERPA_dataset/Datasets_Sherpa_11_feb/Cropland/Cropland_data.dbf")
-
+grid <- list.files("C:/Users/surya/Downloads/Fcover_data_2018_NC/First_four_months/" , pattern = "*.tif$")
+ All_cov <- raster::stack(paste0("C:/Users/surya/Downloads/Fcover_data_2018_NC/First_four_months/", grid))
  
- Cropland2<- Cropland2[,c(2,76:83)]
-
- Cropland1<- merge(Cropland1,Cropland2, by = "POINTID")
-
- Cropland1$Fcover<- Cropland1$Fcover*100
-
- Cropland1 <- Cropland1 %>%
+ sp.pnts = Cropland1[,c("TH_LONG", "TH_LAT")]
+ data<- terra::extract(All_cov,sp.pnts)
+ Cropland1<- cbind(Cropland1,data)
+ 
+ Cropland1$Mean_2018_Fcover1<- Cropland1$Mean_2018_Fcover*100
+ 
+ Cropland1 <- Cropland1 %>% 
    mutate(Fcover_number = case_when(
-     Fcover >= 80 & Fcover <= 100 ~ 10,
-     Fcover < 80 & Fcover >= 75 ~ 9,
-     Fcover < 75 & Fcover >= 70 ~ 8,
-     Fcover < 70 & Fcover >= 65 ~ 7,
-     Fcover < 65 & Fcover >= 60 ~ 6,
-     Fcover < 60 & Fcover >= 55 ~ 5,
-     Fcover < 55 & Fcover >= 50 ~ 4,
-     Fcover < 50 & Fcover >= 45 ~ 3,
-     Fcover < 45 & Fcover >= 40 ~ 2,
-     Fcover < 40 ~ 1
+     Mean_2018_Fcover1 >= 80 & Mean_2018_Fcover1 <= 100 ~ 10,  
+     Mean_2018_Fcover1 < 80 & Mean_2018_Fcover1 >= 75 ~ 9,
+     Mean_2018_Fcover1 < 75 & Mean_2018_Fcover1 >= 70 ~ 8,
+     Mean_2018_Fcover1 < 70 & Mean_2018_Fcover1 >= 65 ~ 7,
+     Mean_2018_Fcover1 < 65 & Mean_2018_Fcover1 >= 60 ~ 6,
+     Mean_2018_Fcover1 < 60 & Mean_2018_Fcover1 >= 55 ~ 5,
+     Mean_2018_Fcover1 < 55 & Mean_2018_Fcover1 >= 50 ~ 4,
+     Mean_2018_Fcover1 < 50 & Mean_2018_Fcover1 >= 45 ~ 3,
+     Mean_2018_Fcover1 < 45 & Mean_2018_Fcover1 >= 40 ~ 2,
+     Mean_2018_Fcover1 < 40 ~ 1
    ))
 
  Cropland1 <- Cropland1 %>%
@@ -728,7 +797,7 @@ Cropland1$percent_manure<- (Cropland1$mean_nmanure_app_crop/Cropland1$Sum_fer_ma
      percent_manure < 50 & percent_manure >= 35 ~ 5,
      percent_manure < 35 & percent_manure >= 20 ~ 4,
      percent_manure < 20 & percent_manure >= 10 ~ 3,
-     percent_manure < 10 & percent_manure >= 0 ~ 2
+     percent_manure < 10 & percent_manure > 0 ~ 2
    ))
 
 Cropland1$Part2<- (Cropland1$Fcover_number+Cropland1$Fertilizer_type_number)/2
@@ -738,31 +807,34 @@ All_data_BO<- read.csv("C:/Users/surya/Downloads/SHERPA_dataset/Cropl_land_Eur_r
 
 All_data_BO<- All_data_BO[,c(6,121)]
 
-Cropland_part1<- merge(Cropland4, All_data_BO, by="POINTID")
+Cropland_part1<- merge(Cropland3, All_data_BO, by="POINTID")
 
 
-Cropland7<- merge(Cropland_part1, Cropland1, by = "POINTID")
+Cropland6<- Cropland1[,c(2,109)]
+
+Cropland7<- merge(Cropland_part1, Cropland6, by = "POINTID")
 
 
-Cropland7$Final_number<- Cropland7$Part2-Cropland7$Part1_number
+Cropland7$Final_number<- Cropland7$Part2-Cropland7$Part1_number_avg
 
 Cropland7<- Cropland7[!is.na(Cropland7$Final_number),]
+
 
 nrow(Cropland7)
 ```
 
-    ## [1] 3644
+    ## [1] 3534
 
 ``` r
-Cropland7<- Cropland7[,c(1,105:125,239:240)]
+Cropland7<- Cropland7[,c(1,84:135)]
 
 
 old_names <- c(
   "Soil_erosion_number", "LS_number", "Zinc_number", "Antimony_number", "Lead_number",
   "Nickel_number", "Mercury_number", "Cobalt_number", "Chromium_number", "Copper_number",
   "Cadmium_number", "Arsenic_number", "EC_number", "Nitrogen_number",
-  "Phophorus_number_excess", "Phophorus_number_mining", "Pesticide_Risk_Score", "C_loss_score",
-  "Soil_bulk_density_score", "Part1_number", "Final_number"
+  "Phophorus_number_excess", "Phophorus_number_mining", "Pesticide_Risk_Score", "soc_final_number",
+  "Soil_bulk_density_score", "Part1_number_avg","Part2", "Final_number"
 )
 
 new_names <- c(
@@ -770,7 +842,7 @@ new_names <- c(
   "Nickel", "Mercury", "Cobalt", "Chromium", "Copper",
   "Cadmium", "Arsenic", "Salinity", "Nitrogen.excess",
   "Phophorus.excess", "Phophorus.mining", "Pesticide.risk", "Carbon.loss",
-  "Compaction", "Part1", "Final_number"
+  "Compaction", "Part2", "Part1","Final_number"
 )
 
 
@@ -787,13 +859,13 @@ Part1_part2_grassland_avg <- Part1_part2_grassland %>%
   summarise(across(where(is.numeric), ~mean(.x, na.rm = TRUE)))
 
 variable_order <- c(
-  "Part2","Soil.erosion","Landslide", "Compaction", "Nitrogen.excess",
+  "Part1","Soil.erosion","Landslide", "Compaction", "Nitrogen.excess",
   "Phophorus.excess","Phophorus.mining", "Carbon.loss", "Pesticide.risk", "Salinity", "Zinc",
   "Antimony", "Lead", "Nickel", "Mercury",
   "Cobalt", "Chromium", "Copper", "Cadmium",
   "Arsenic"
 )
-
+# Transform the data to long format and filter variables
 data_long <- Part1_part2_grassland_avg %>%
   dplyr::select(all_of(c("Class", variable_order))) %>%  # Select required variables
   pivot_longer(cols = -Class,
@@ -802,10 +874,11 @@ data_long <- Part1_part2_grassland_avg %>%
   mutate(Variable = factor(Variable, levels = variable_order)) %>%  # Order variables
   group_by(Class) %>%
   arrange(Class, Variable) %>%  # Ensure correct order for cumulative calculation
-  mutate(Cumulative = if_else(Variable == "Part2", Value, NA_real_)) %>%  # Initialize Cumulative
+  mutate(Cumulative = if_else(Variable == "Part1", Value, NA_real_)) %>%  # Initialize Cumulative
   mutate(Cumulative = replace(Cumulative, is.na(Cumulative),
-                              first(Cumulative, order_by = Variable) - cumsum(Value[Variable != "Part2"]))) %>%
+                              first(Cumulative, order_by = Variable) - cumsum(Value[Variable != "Part1"]))) %>%
   ungroup()
+
 
 # Convert Class to a factor (ensures correct color mapping)
   Cropland7$Class <- as.factor(Cropland7$Class)
@@ -822,18 +895,18 @@ class_colors <- c("#7fbf4d","#d864a6","#ffbf33","#4a98c9")
          x = "Final SHERPA Score",
          y = "Count") +
     scale_fill_manual(values = class_colors) +  # Apply color mapping
-    theme_minimal(base_size = 16) +
-    theme(
-      axis.text.x = element_text(angle = 45, hjust = 1, size = 16, color = "black"),
-    axis.text.y = element_text(size = 16, color = "black"),
-    axis.title.x = element_text(size = 16, face = "bold"),
-    axis.title.y = element_text(size = 16, face = "bold"),
-    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    theme_minimal(base_size = 14) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 14, color = "black"),
+    axis.text.y = element_text(size = 14, color = "black"),
+    axis.title.x = element_text(size = 14, face = "bold"),
+    axis.title.y = element_text(size = 14, face = "bold"),
+    plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
     panel.grid.major = element_line(color = "gray80"),
     panel.grid.minor = element_blank(),
     legend.position = "top",
-    legend.title = element_text(size = 16, face = "bold"),
-    legend.text = element_text(size = 16)
+    legend.title = element_text(size = 14, face = "bold"),
+    legend.text = element_text(size = 14)
   )
 ```
 
@@ -844,7 +917,7 @@ class_colors <- c("#7fbf4d","#d864a6","#ffbf33","#4a98c9")
 ggplot(data_long, aes(x = Variable, y = Cumulative, color = Class, group = Class)) +
   geom_line(size = 1.2) +
   geom_point(size = 3) +
-  scale_y_continuous(limits = c(-30, 10)) +
+  scale_y_continuous(limits = c(-40, 10)) +
   scale_color_manual(values = class_colors) +  # Apply color mapping
   labs(
     title = "Cumulative Reductions (Cropland)",
@@ -852,24 +925,24 @@ ggplot(data_long, aes(x = Variable, y = Cumulative, color = Class, group = Class
     y = "Cumulative Reduction",
     color = "Class"
   ) +
-  theme_minimal(base_size = 16) +
+ theme_minimal(base_size = 14) +
   theme(
-   axis.text.x = element_text(angle = 45, hjust = 1, size = 16, color = "black"),
-    axis.text.y = element_text(size = 16, color = "black"),
-    axis.title.x = element_text(size = 16, face = "bold"),
-    axis.title.y = element_text(size = 16, face = "bold"),
-    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 14, color = "black"),
+    axis.text.y = element_text(size = 14, color = "black"),
+    axis.title.x = element_text(size = 14, face = "bold"),
+    axis.title.y = element_text(size = 14, face = "bold"),
+    plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
     panel.grid.major = element_line(color = "gray80"),
     panel.grid.minor = element_blank(),
     legend.position = "top",
-    legend.title = element_text(size = 16, face = "bold"),
-    legend.text = element_text(size = 16)
+    legend.title = element_text(size = 14, face = "bold"),
+    legend.text = element_text(size = 14)
   )
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-3-3.png)<!-- -->
 
-## Grassland (Part1)
+## Grassland (Part2)
 
 ``` r
 Grassland2<- Grassland[,c(1:52, 78:95)]
@@ -886,9 +959,10 @@ Grassland4<- Grassland2[!is.na(Grassland2$Net_phophorus),]
 ##read grassland_data
 Grassland5<- read.dbf("C:/Users/surya/Downloads/SHERPA_dataset/Datasets_Sherpa_11_feb/Grassland_data.dbf")
 
-Grassland5<- Grassland5[,c(2,72:77)]
+Grassland5<- Grassland5[,c(2,72:79)]
 
 Grassland4<- merge(Grassland4, Grassland5, by = "POINTID")
+
 
 ############Soil texture
 
@@ -1031,18 +1105,18 @@ Grassland4<-Grassland4 %>% mutate(Cobalt_number =
 
 
 Grassland4<-Grassland4 %>% mutate(Chromium_number =
-                                    case_when(Chromium == -9999 ~ NA_real_,
-                                      Chromium>= 0 &  Chromium<=70 ~ 0, 
-                                              Chromium> 70 &  Chromium<=25 ~ 1,
-                                              Chromium> 90 & Chromium<=30~ 2,
-                                              Chromium> 110 &  Chromium<=35 ~ 3,
-                                              Chromium> 130 &  Chromium<=40 ~ 4,
-                                              Chromium> 155 &  Chromium<=45 ~ 5,
-                                              Chromium> 180 &  Chromium<=50 ~ 6,
-                                              Chromium> 205 &  Chromium<=55 ~ 7,
-                                              Chromium> 230 &  Chromium<=60 ~ 8,
-                                              Chromium> 250 ~ 9
-                                    )
+                                                case_when(Chromium == -9999 ~ NA_real_,
+                                                          Chromium>= 0 &  Chromium<=70 ~ 0, 
+                                                          Chromium> 70 &  Chromium<=90 ~ 1,
+                                                          Chromium> 90 & Chromium<=110~ 2,
+                                                          Chromium> 110 &  Chromium<=130 ~ 3,
+                                                          Chromium> 130 &  Chromium<=155 ~ 4,
+                                                          Chromium> 155 &  Chromium<=180 ~ 5,
+                                                          Chromium> 180 &  Chromium<=205 ~ 6,
+                                                          Chromium> 205 &  Chromium<=230 ~ 7,
+                                                          Chromium> 230 &  Chromium<=250 ~ 8,
+                                                          Chromium> 250 ~ 9
+                                                )
 )
 
 Grassland4<-Grassland4 %>% mutate(Copper_number =
@@ -1109,6 +1183,8 @@ Grassland4<-Grassland4 %>% mutate(EC_number =
                                     )
 )
 
+colnames(Grassland4)[which(colnames(Grassland4)%in% c("mean_raste"))]<- "Nitrogen_Surplus"
+
 Grassland4<-Grassland4 %>% mutate(Nitrogen_number =
                                     case_when(Nitrogen_Surplus == -9999 ~ NA_real_,
                                       Nitrogen_Surplus<2 ~ 0, 
@@ -1144,20 +1220,39 @@ Grassland4<-Grassland4 %>% mutate(Phophorus_number_excess =
 
 ###################################SOC loss
 
-Grassland4 <- Grassland4 %>% 
-  mutate(C_loss_score = case_when(
-    Stock_carb == -9999 ~ NA_real_,                    # If value is -9999, assign NA
-    Stock_carb >= 0 ~ 0,                                # 0 to positive (e.g., SOC accumulation)
-    Stock_carb > -0.5 & Stock_carb <= 0 ~ 1,            # < 0 to -0.5
-    Stock_carb > -1.5 & Stock_carb <= -0.5 ~ 2,         # < -0.5 to -1.5
-    Stock_carb > -3 & Stock_carb <= -1.5 ~ 3,           # < -1.5 to -3
-    Stock_carb > -4 & Stock_carb <= -3 ~ 4,             # < -3 to -4
-    Stock_carb > -5 & Stock_carb <= -4 ~ 5,             # < -4 to -5
-    Stock_carb > -6 & Stock_carb <= -5 ~ 6,             # < -5 to -6
-    Stock_carb > -7 & Stock_carb <= -6 ~ 7,             # < -6 to -7
-    Stock_carb > -8 & Stock_carb <= -7 ~ 8,             # < -7 to -8
-    Stock_carb < -8 ~ 9                                # < -8
+Grassland4$OC1<- Grassland4$OC/10
+
+Grassland4$SOC_clay_ratio<- (Grassland4$OC1/Grassland4$Clay_1)
+
+Grassland4 <- Grassland4 %>%
+  mutate(SOC_clay_raio_number = case_when(
+    SOC_clay_ratio == -9999 ~ NA_real_,                 
+    SOC_clay_ratio >= 0.125 ~ 0,                        
+    SOC_clay_ratio < 0.125 & SOC_clay_ratio >= 0.111 ~ 1,  
+    SOC_clay_ratio < 0.111 & SOC_clay_ratio >= 0.1   ~ 3,  
+    SOC_clay_ratio < 0.1   & SOC_clay_ratio >= 0.090 ~ 5,  
+    SOC_clay_ratio < 0.090 & SOC_clay_ratio >= 0.0833 ~ 7, 
+    SOC_clay_ratio < 0.0833 & SOC_clay_ratio >= 0.077 ~ 8, 
+    SOC_clay_ratio < 0.077 ~ 9                          
   ))
+
+Grassland4 <- Grassland4 %>%
+  mutate(SOC_score2 = case_when(
+    OC1 > 5               ~ 0,
+    OC1 > 4.5 & OC1 <= 5  ~ 1,
+    OC1 > 4   & OC1 <= 4.5  ~ 2,
+    OC1 > 3.5 & OC1 <= 4    ~ 3,
+    OC1 > 3   & OC1 <= 3.5  ~ 4,
+    OC1 > 2.5 & OC1 <= 3    ~ 5,
+    OC1 > 2   & OC1 <= 2.5  ~ 6,
+    OC1 > 1.5 & OC1 <= 2    ~ 7,
+    OC1 > 0.5 & OC1 <= 1.5  ~ 8,
+    OC1 <= 0.5                     ~ 9,
+    TRUE                                ~ NA_real_  
+  ))
+
+Grassland4$soc_final_number<- (Grassland4$SOC_clay_raio_number + Grassland4$SOC_score2)/2
+
 
 
 
@@ -1182,20 +1277,22 @@ Grassland4 <- Grassland4 %>%
 
 ########################################################
 
-Grassland4$Part1_number<- Grassland4$Phophorus_number+Grassland4$Nitrogen_number+Grassland4$EC_number+Grassland4$Arsenic_number+Grassland4$Cadmium_number+
-  Grassland4$Copper_number+Grassland4$Chromium_number+Grassland4$Cobalt_number+Grassland4$Mercury_number+Grassland4$Nickel_number+Grassland4$Lead_number+Grassland4$Antimony_number+
-  Grassland4$Zinc_number+Grassland4$Soil_erosion_number+Grassland4$Soil_bulk_density_score+Grassland4$C_loss_score+
-  Grassland4$LS_number
-
+Grassland4$Part1_number<- Grassland4$Phophorus_number_excess+Grassland4$Nitrogen_number+Grassland4$EC_number+Grassland4$Arsenic_number+Grassland4$Cadmium_number+
+   Grassland4$Copper_number+Grassland4$Chromium_number+Grassland4$Cobalt_number+Grassland4$Mercury_number+Grassland4$Nickel_number+Grassland4$Lead_number+Grassland4$Antimony_numb+
+  Grassland4$Zinc_number+Grassland4$Soil_erosion_number+Grassland4$Soil_bulk_density_score+Grassland4$soc_final_number+
+   Grassland4$LS_number
+ 
 Grassland4<- Grassland4[!is.na(Grassland4$Part1_number),]
 
-hist(Grassland4$Part1_number)
+Grassland4$Part1_number_avg<- (Grassland4$Part1_number/17)
+
+hist(Grassland4$Part1_number_avg)
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
 ``` r
-## Regional variability in Part1 scores across Europe
+## Regional variability in Part2 scores across Europe and camparison with Panagos et al. (2024) soil degradation process data (see Figure S2.1 in SI2 document)
 
 All_data_BO<- read.csv("C:/Users/surya/Downloads/SHERPA_dataset/Grassland_land_Eur_reg.csv")
 
@@ -1203,37 +1300,46 @@ All_data_BO<- All_data_BO[,c(6,93)]
 
 All_data_BO<- merge(Grassland4, All_data_BO, by = "POINTID")
 
-level_order <- c('Northern', 'Western', 'Cent_Eastern', 'Southern') 
+All_data_BO<- All_data_BO[All_data_BO$Sum_datase<126,]
+
+All_data_BO<- All_data_BO[All_data_BO$Sum_datase>-1,]
+
+counts <- All_data_BO %>%
+  group_by(Class) %>%
+  summarise(Count = n())
+
+All_data_BO$part22<- 0-All_data_BO$Part1_number_avg
 
 my_colors <- c(
-  "Northern" = "#0000FF", # Orange
-  "Western" = "#800080", # Blue
-  "Cent_Eastern" = "#FF0000", # Green
-  "Southern" = "#90EE90"  # Yellow
+  c("#7fbf4d","#d864a6","#ffbf33","#4a98c9") 
 )
-p <- ggplot(All_data_BO, aes(x = factor(Class, level = level_order), y = Part1_number, fill = Class)) + 
-  geom_boxplot(outlier.shape = NA, width = 0.6, alpha = 0.7, position = position_dodge(width = 0.75)) +  
+
+level_order <- c('Northern', 'Western', 'Cent_Eastern', 'Southern') 
+
+p <- ggplot(All_data_BO, aes(x = factor(Class, level = level_order), y = part22, fill = Class)) + 
+  geom_boxplot(outlier.shape = NA, width = 0.6, alpha = 0.7, position = position_dodge(width = 0.75)) +  # Separate boxplots
+  # Separate points
   labs(x = "European region [-]",
-       y = "Part1_Number [-]") +  
-  theme_minimal(base_size = 15) +  
+       y = "Part2_Number [-]") +  # Add title
+  theme_minimal(base_size = 15) +  # Clean background
   theme(
     axis.text = element_text(size = 18),
     axis.title = element_text(size = 20, face = "bold"),
-    plot.title = element_text(size = 22, face = "bold", hjust = 0.5),  
+    plot.title = element_text(size = 22, face = "bold", hjust = 0.5),  # Centered title
     legend.position = "bottom",
     legend.text = element_text(size = 18),
     legend.title = element_text(size = 18)
   ) +
-  scale_y_continuous(limits = c(0, 50), expand = c(0, 0)) +  
-  scale_fill_manual(values = my_colors) +  
-  scale_color_manual(values = my_colors)  
+  scale_y_reverse(limits = c(0, -5), expand = c(0, 0)) +  # Set limits and remove extra space
+  scale_fill_manual(values = my_colors) +  # Apply custom colors to fill
+  scale_color_manual(values = my_colors)  # Apply custom colors to points
 
 print(p)
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-4-2.png)<!-- -->
 
-## Grassland (Part2)
+## Grassland (Part1)
 
 ``` r
 ## Extracting Land use/land cover data for the period 2016–2020 to extract the permanent grassland sites
@@ -1287,29 +1393,31 @@ All_data_BO<- All_data_BO[,c(6,93)]
 
 Grasslandpart1<- merge( Grassland4, All_data_BO, by="POINTID")
 
+Grassland1<- Grassland1[,c("POINTID", "Fcover_number")]
+
 test<- merge(Grasslandpart1, Grassland1, by = "POINTID")
 
 ## Calculating final score by subtracting part2 (Fcover_number) with part1 
 
-test$Final_number<- test$Fcover_number-test$Part1_number
+test$Final_number<- test$Fcover_number-test$Part1_number_avg
 
 test<- test[!is.na(test$Final_number),]
 
 nrow(test)
 ```
 
-    ## [1] 477
+    ## [1] 637
 
 ``` r
 ############test1
-test<- test[,c(1,22,23,79:97, 199:200)]
+test<- test[,c(1:27, 80:106)]
 
 old_names <- c(
   "Soil_erosion_number", "LS_number", "Zinc_number", "Antimony_number", "Lead_number", 
   "Nickel_number", "Mercury_number", "Cobalt_number", "Chromium_number", "Copper_number", 
   "Cadmium_number", "Arsenic_number", "EC_number", "Nitrogen_number", 
-  "Phophorus_number_excess", "C_loss_score", 
-  "Soil_bulk_density_score", "Part1_number", "Fcover_number", "Final_number"
+  "Phophorus_number_excess", "soc_final_number", 
+  "Soil_bulk_density_score", "Part1_number_avg", "Fcover_number", "Final_number"
 )
 
 new_names <- c(
@@ -1317,14 +1425,11 @@ new_names <- c(
   "Nickel", "Mercury", "Cobalt", "Chromium", "Copper",
   "Cadmium", "Arsenic", "Salinity", "Nitrogen.excess",
   "Phophorus.excess", "Carbon.loss",
-  "Compaction", "Part1", "Part2", "Final_number"
+  "Compaction", "Part2", "Part1", "Final_number"
 )
 
 
 test <- test %>% rename(!!!setNames(old_names,new_names))
-
-#write.csv(test, "C:/Users/surya/Downloads/SHERPA_dataset/Forest_data_477.csv")
-
 
 Part1_part2_grassland <- test %>%
   mutate(Class = as.character(Class))  # Convert Class to character if needed
@@ -1336,7 +1441,7 @@ Part1_part2_grassland_avg <- Part1_part2_grassland %>%
 
 # Specify the desired order of variables
 variable_order <- c(
-  "Part2","Soil.erosion","Landslide", "Compaction", "Nitrogen.excess",
+  "Part1","Soil.erosion","Landslide", "Compaction", "Nitrogen.excess",
   "Phophorus.excess", "Carbon.loss", "Salinity", "Zinc",
   "Antimony", "Lead", "Nickel", "Mercury",
   "Cobalt", "Chromium", "Copper", "Cadmium",
@@ -1352,12 +1457,12 @@ data_long <- Part1_part2_grassland_avg %>%
   mutate(Variable = factor(Variable, levels = variable_order)) %>%  # Order variables
   group_by(Class) %>%
   arrange(Class, Variable) %>%  # Ensure correct order for cumulative calculation
-  mutate(Cumulative = if_else(Variable == "Part2", Value, NA_real_)) %>%  # Initialize Cumulative
+  mutate(Cumulative = if_else(Variable == "Part1", Value, NA_real_)) %>%  # Initialize Cumulative
   mutate(Cumulative = replace(Cumulative, is.na(Cumulative),
-                              first(Cumulative, order_by = Variable) - cumsum(Value[Variable != "Part2"]))) %>%
+                              first(Cumulative, order_by = Variable) - cumsum(Value[Variable != "Part1"]))) %>%
   ungroup()
 
-write.csv(data_long,"C:/Users/surya/Downloads/SHERPA_dataset/data_Grassland_diff_European zone.csv" )
+#write.csv(data_long,"C:/Users/surya/Downloads/SHERPA_dataset/data_Grassland_diff_European zone.csv" )
 
 # Convert Class to a factor 
 test$Class <- as.factor(test$Class)
@@ -1372,20 +1477,20 @@ ggplot(test, aes(x = Final_number, fill = Class)) +
   geom_histogram(binwidth = 2, alpha = 0.6, position = "stack") +
   labs(title = "Histogram of Final Score (Grassland)",
        x = "Final SHERPA Score",
-       y = "Count") +
+       y = "Count") + 
   scale_fill_manual(values = class_colors) +  # Apply color mapping
-  theme_minimal(base_size = 16) +  
+  theme_minimal(base_size = 14) +
   theme(
-    axis.text.x = element_text(angle = 45, hjust = 1, size = 16, color = "black"),
-    axis.text.y = element_text(size = 16, color = "black"),
-    axis.title.x = element_text(size = 16, face = "bold"),
-    axis.title.y = element_text(size = 16, face = "bold"),
-    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 14, color = "black"),
+    axis.text.y = element_text(size = 14, color = "black"),
+    axis.title.x = element_text(size = 14, face = "bold"),
+    axis.title.y = element_text(size = 14, face = "bold"),
+    plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
     panel.grid.major = element_line(color = "gray80"),
     panel.grid.minor = element_blank(),
     legend.position = "top",
-    legend.title = element_text(size = 16, face = "bold"),
-    legend.text = element_text(size = 16)
+    legend.title = element_text(size = 14, face = "bold"),
+    legend.text = element_text(size = 14)
   )
 ```
 
@@ -1421,7 +1526,7 @@ ggplot(data_long, aes(x = Variable, y = Cumulative, color = Class, group = Class
 
 ![](README_files/figure-gfm/unnamed-chunk-5-3.png)<!-- -->
 
-## Forest (Part1)
+## Forest (Part2)
 
 ``` r
 Forest_data<- read.dbf("C:/Users/surya/Downloads/SHERPA_dataset/Datasets_Sherpa_11_feb/Forest/Forest_data_13_feb.dbf")
@@ -1544,19 +1649,19 @@ Forest_data<-Forest_data %>% mutate(Cobalt_number =
 )
 
 
-Forest_data<-Forest_data %>% mutate(Chromium_number =
-                                    case_when(Chromium == -9999 ~ NA_real_,
-                                      Chromium>= 0 &  Chromium<=70 ~ 0, 
-                                              Chromium> 70 &  Chromium<=25 ~ 1,
-                                              Chromium> 90 & Chromium<=30~ 2,
-                                              Chromium> 110 &  Chromium<=35 ~ 3,
-                                              Chromium> 130 &  Chromium<=40 ~ 4,
-                                              Chromium> 155 &  Chromium<=45 ~ 5,
-                                              Chromium> 180 &  Chromium<=50 ~ 6,
-                                              Chromium> 205 &  Chromium<=55 ~ 7,
-                                              Chromium> 230 &  Chromium<=60 ~ 8,
-                                              Chromium> 250 ~ 9
-                                    )
+Forest_data<-Forest_data %>%  mutate(Chromium_number =
+                                       case_when(Chromium == -9999 ~ NA_real_,
+                                                 Chromium>= 0 &  Chromium<=70 ~ 0, 
+                                                 Chromium> 70 &  Chromium<=90 ~ 1,
+                                                 Chromium> 90 & Chromium<=110~ 2,
+                                                 Chromium> 110 &  Chromium<=130 ~ 3,
+                                                 Chromium> 130 &  Chromium<=155 ~ 4,
+                                                 Chromium> 155 &  Chromium<=180 ~ 5,
+                                                 Chromium> 180 &  Chromium<=205 ~ 6,
+                                                 Chromium> 205 &  Chromium<=230 ~ 7,
+                                                 Chromium> 230 &  Chromium<=250 ~ 8,
+                                                 Chromium> 250 ~ 9
+                                       )
 )
 
 Forest_data<-Forest_data %>% mutate(Copper_number =
@@ -1630,6 +1735,9 @@ Forest_data$Part1_number<- Forest_data$Nitrogen_number+Forest_data$Arsenic_numbe
 
 Forest_data<- Forest_data[!is.na(Forest_data$Part1_number),]
 
+Forest_data$Part1_number_avg<- (Forest_data$Part1_number)/13
+
+
 hist(Forest_data$Part1_number)
 ```
 
@@ -1644,20 +1752,19 @@ All_data_BO<- All_data_BO[,c(7,59)]
 
 All_data_BO<- merge(Forest_data, All_data_BO, by = "code23")
 
-level_order <- c('Northern', 'Western', 'Cent_Eastern', 'Southern') 
+All_data_BO$part22<- 0-All_data_BO$Part1_number_avg
 
 my_colors <- c(
-  "Northern" = "#0000FF", # Orange
-  "Western" = "#800080", # Blue
-  "Cent_Eastern" = "#FF0000", # Green
-  "Southern" = "#90EE90"  # Yellow
+  c("#7fbf4d","#d864a6","#ffbf33","#4a98c9") 
 )
 
-p <- ggplot(All_data_BO, aes(x = factor(Class, level = level_order), y = Part1_number, fill = Class)) + 
+level_order <- c('Northern', 'Western', 'Cent_Eastern', 'Southern') 
+
+p <- ggplot(All_data_BO, aes(x = factor(Class, level = level_order), y = part22, fill = Class)) + 
   geom_boxplot(outlier.shape = NA, width = 0.6, alpha = 0.7, position = position_dodge(width = 0.75)) +  # Separate boxplots
   # Separate points
   labs(x = "European region [-]",
-       y = "Part1_Number [-]") +  # Add title
+       y = "Part2_Number [-]") +  # Add title
   theme_minimal(base_size = 15) +  # Clean background
   theme(
     axis.text = element_text(size = 18),
@@ -1667,7 +1774,7 @@ p <- ggplot(All_data_BO, aes(x = factor(Class, level = level_order), y = Part1_n
     legend.text = element_text(size = 18),
     legend.title = element_text(size = 18)
   ) +
-  scale_y_continuous(limits = c(0, 50), expand = c(0, 0)) +  # Set limits and remove extra space
+  scale_y_reverse(limits = c(0, -5), expand = c(0, 0)) +  # Set limits and remove extra space
   scale_fill_manual(values = my_colors) +  # Apply custom colors to fill
   scale_color_manual(values = my_colors)  # Apply custom colors to points
 
@@ -1676,7 +1783,7 @@ print(p)
 
 ![](README_files/figure-gfm/unnamed-chunk-6-2.png)<!-- -->
 
-## Forest (Part2)
+## Forest (Part1)
 
 ``` r
 Forest_data2<- read.csv("C:/Users/surya/Downloads/SHERPA_dataset/ICP_geo_shp_elev1.csv")
@@ -1735,18 +1842,59 @@ filtered_data_forest_Sec <- Second_case_cac %>%
   filter(code_horizon_master %in% selected_classes)
 ############################################################
 
+Forest_part1<- read.csv("C:/Users/surya/Downloads/SHERPA_dataset/Datasets_Sherpa_11_feb/Forest/Forest_points_numbers1_18_08.csv")
+colnames(Forest_part1)
+```
+
+    ##  [1] "X"                   "Field1"              "code23"             
+    ##  [4] "code23_X"            "code23_Y"            "ddlat"              
+    ##  [7] "ddlong"              "Elevation"           "Humus"              
+    ## [10] "descriptio"          "Parent_mat"          "RASTERVALU"         
+    ## [13] "Cadmium"             "Copper"              "Chromium"           
+    ## [16] "Cobalt"              "Mercury"             "Manganese"          
+    ## [19] "Nickel"              "Lead"                "Soil_erosi"         
+    ## [22] "Antimony"            "Zn"                  "LUCAS_medi"         
+    ## [25] "ndep_nhx15"          "net_nitrogen"        "LS"                 
+    ## [28] "Sum_data_2"          "Soil_erosion_number" "LS_number"          
+    ## [31] "Zinc_number"         "Antimony_number"     "Lead_number"        
+    ## [34] "Nickel_number"       "Mercury_number"      "Cobalt_number"      
+    ## [37] "Chromium_number"     "Copper_number"       "Cadmium_number"     
+    ## [40] "Arsenic_number"      "Nitrogen_number"     "Part1_number"       
+    ## [43] "Part1_number_avg"
+
+``` r
 Forest_part2<- read.csv("C:/Users/surya/Downloads/SHERPA_dataset/Part2_Forest.csv")
 Forest_part11<- Forest_part2[,c(2,13)]
-Forest_data11<- merge(Forest_data, Forest_part11, by = "code23")
-Forest_data11$Final_number<- Forest_data11$Part2.score_Forest-Forest_data11$Part1_number
-
+Forest_data11<- merge(Forest_part1, Forest_part11, by = "code23")
+Forest_data11$Final_number<- Forest_data11$Part2.score_Forest-Forest_data11$Part1_number_avg
 All_data_BO<- read.csv("C:/Users/surya/Downloads/SHERPA_dataset/Forest_land_Eur_reg.csv")
 
 All_data_BO<- All_data_BO[,c(7,59)]
 
 Forest_part1<- merge(Forest_data11, All_data_BO, by="code23")
 
-Forest_part1<- Forest_part1[,c(1,26:43)]
+colnames(Forest_part1)
+```
+
+    ##  [1] "code23"              "X"                   "Field1"             
+    ##  [4] "code23_X"            "code23_Y"            "ddlat"              
+    ##  [7] "ddlong"              "Elevation"           "Humus"              
+    ## [10] "descriptio"          "Parent_mat"          "RASTERVALU"         
+    ## [13] "Cadmium"             "Copper"              "Chromium"           
+    ## [16] "Cobalt"              "Mercury"             "Manganese"          
+    ## [19] "Nickel"              "Lead"                "Soil_erosi"         
+    ## [22] "Antimony"            "Zn"                  "LUCAS_medi"         
+    ## [25] "ndep_nhx15"          "net_nitrogen"        "LS"                 
+    ## [28] "Sum_data_2"          "Soil_erosion_number" "LS_number"          
+    ## [31] "Zinc_number"         "Antimony_number"     "Lead_number"        
+    ## [34] "Nickel_number"       "Mercury_number"      "Cobalt_number"      
+    ## [37] "Chromium_number"     "Copper_number"       "Cadmium_number"     
+    ## [40] "Arsenic_number"      "Nitrogen_number"     "Part1_number"       
+    ## [43] "Part1_number_avg"    "Part2.score_Forest"  "Final_number"       
+    ## [46] "Class"
+
+``` r
+Forest_part1<- Forest_part1[,c(1,26:46)]
 
 nrow(Forest_part1)
 ```
@@ -1757,12 +1905,12 @@ nrow(Forest_part1)
 old_names <- c(
   "Soil_erosion_number", "LS_number", "Zinc_number", "Antimony_number", "Lead_number",
   "Nickel_number", "Mercury_number", "Cobalt_number", "Chromium_number", "Copper_number",
-  "Cadmium_number", "Arsenic_number",  "Nitrogen_number", "Part1_number","Part2.score_Forest", "Final_number")
+  "Cadmium_number", "Arsenic_number",  "Nitrogen_number", "Part1_number_avg","Part2.score_Forest", "Final_number")
 
 new_names <- c(
   "Soil.erosion", "Landslide", "Zinc", "Antimony", "Lead",
   "Nickel", "Mercury", "Cobalt", "Chromium", "Copper",
-  "Cadmium", "Arsenic", "Nitrogen.excess", "Part1","Part2", "Final_number"
+  "Cadmium", "Arsenic", "Nitrogen.excess", "Part2","Part1", "Final_number"
 )
 
 Forest_part1 <- Forest_part1 %>% rename(!!!setNames(old_names,new_names))
@@ -1776,8 +1924,9 @@ Part1_part2_grassland_avg <- Part1_part2_grassland %>%
   group_by(Class) %>%
   summarise(across(where(is.numeric), ~mean(.x, na.rm = TRUE)))
 
+
 variable_order <- c(
-  "Part2","Soil.erosion","Landslide", "Nitrogen.excess", "Zinc",
+  "Part1","Soil.erosion","Landslide", "Nitrogen.excess", "Zinc",
   "Antimony", "Lead", "Nickel", "Mercury",
   "Cobalt", "Chromium", "Copper", "Cadmium",
   "Arsenic"
@@ -1792,11 +1941,11 @@ data_long <- Part1_part2_grassland_avg %>%
   mutate(Variable = factor(Variable, levels = variable_order)) %>%  # Order variables
   group_by(Class) %>%
   arrange(Class, Variable) %>%  # Ensure correct order for cumulative calculation
-  mutate(Cumulative = if_else(Variable == "Part2", Value, NA_real_)) %>%  # Initialize Cumulative
+  mutate(Cumulative = if_else(Variable == "Part1", Value, NA_real_)) %>%  # Initialize Cumulative
   mutate(Cumulative = replace(Cumulative, is.na(Cumulative),
-                              first(Cumulative, order_by = Variable) - cumsum(Value[Variable != "Part2"]))) %>%
+                              first(Cumulative, order_by = Variable) - cumsum(Value[Variable != "Part1"]))) %>%
   ungroup()
-
+########################################
 # Convert Class to a factor (ensures correct color mapping)
 Forest_part1$Class <- as.factor(Forest_part1$Class)
 data_long$Class <- as.factor(data_long$Class)
@@ -1811,18 +1960,18 @@ ggplot(Forest_part1, aes(x = Final_number, fill = Class)) +
        x = "Final SHERPA Score",
        y = "Count") +
   scale_fill_manual(values = class_colors) +  # Apply color mapping
-  theme_minimal(base_size = 16) +
+  theme_minimal(base_size = 14) +
   theme(
-   axis.text.x = element_text(angle = 45, hjust = 1, size = 16, color = "black"),
-    axis.text.y = element_text(size = 16, color = "black"),
-    axis.title.x = element_text(size = 16, face = "bold"),
-    axis.title.y = element_text(size = 16, face = "bold"),
-    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 14, color = "black"),
+    axis.text.y = element_text(size = 14, color = "black"),
+    axis.title.x = element_text(size = 14, face = "bold"),
+    axis.title.y = element_text(size = 14, face = "bold"),
+    plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
     panel.grid.major = element_line(color = "gray80"),
     panel.grid.minor = element_blank(),
     legend.position = "top",
-    legend.title = element_text(size = 16, face = "bold"),
-    legend.text = element_text(size = 16)
+    legend.title = element_text(size = 14, face = "bold"),
+    legend.text = element_text(size = 14)
   )
 ```
 
@@ -1841,18 +1990,18 @@ ggplot(data_long, aes(x = Variable, y = Cumulative, color = Class, group = Class
     y = "Cumulative Reduction",
     color = "Class"
   ) +
-  theme_minimal(base_size = 16) +
+  theme_minimal(base_size = 14) +
   theme(
-   axis.text.x = element_text(angle = 45, hjust = 1, size = 16, color = "black"),
-    axis.text.y = element_text(size = 16, color = "black"),
-    axis.title.x = element_text(size = 16, face = "bold"),
-    axis.title.y = element_text(size = 16, face = "bold"),
-    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 14, color = "black"),
+    axis.text.y = element_text(size = 14, color = "black"),
+    axis.title.x = element_text(size = 14, face = "bold"),
+    axis.title.y = element_text(size = 14, face = "bold"),
+    plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
     panel.grid.major = element_line(color = "gray80"),
     panel.grid.minor = element_blank(),
     legend.position = "top",
-    legend.title = element_text(size = 16, face = "bold"),
-    legend.text = element_text(size = 16)
+    legend.title = element_text(size = 14, face = "bold"),
+    legend.text = element_text(size = 14)
   )
 ```
 
