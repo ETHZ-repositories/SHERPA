@@ -664,16 +664,16 @@ Cropland3 <- Cropland3 %>%
   ))
 
 
-Cropland3$Part1_number<- Cropland3$Nitrogen_number+Cropland3$EC_number+Cropland3$Arsenic_number+Cropland3$Cadmium_number+
+Cropland3$Part2_number<- Cropland3$Nitrogen_number+Cropland3$EC_number+Cropland3$Arsenic_number+Cropland3$Cadmium_number+
   Cropland3$Copper_number+Cropland3$Chromium_number+Cropland3$Cobalt_number+Cropland3$Mercury_number+Cropland3$Nickel_number+Cropland3$Lead_number+Cropland3$Antimony_number+
   Cropland3$Zinc_number+Cropland3$Soil_erosion_number+Cropland3$Phophorus_number_excess+Cropland3$Phophorus_number_mining+Cropland3$Soil_bulk_density_score+
   Cropland3$Pesticide_Risk_Score+Cropland3$LS_number+Cropland3$soc_final_number
 
-Cropland3<- Cropland3[!is.na(Cropland3$Part1_number),]
+Cropland3<- Cropland3[!is.na(Cropland3$Part2_number),]
 
-Cropland3$Part1_number_avg<- (Cropland3$Part1_number)/19
+Cropland3$Part2_number_avg<- (Cropland3$Part2_number)/19
 
-hist(Cropland3$Part1_number_avg)
+hist(Cropland3$Part2_number_avg)
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
@@ -701,7 +701,7 @@ counts <- All_data_BO %>%
   group_by(Class) %>%
   summarise(Count = n())
 
-All_data_BO$part22<- 0-All_data_BO$Part1_number_avg
+All_data_BO$part22<- 0-All_data_BO$Part2_number_avg
 
 my_colors <- c(
   c("#7fbf4d","#d864a6","#ffbf33","#4a98c9") 
@@ -800,7 +800,7 @@ grid <- list.files("C:/Users/surya/Downloads/Fcover_data_2018_NC/First_four_mont
      percent_manure < 10 & percent_manure > 0 ~ 2
    ))
 
-Cropland1$Part2<- (Cropland1$Fcover_number+Cropland1$Fertilizer_type_number)/2
+Cropland1$Part1<- (Cropland1$Fcover_number+Cropland1$Fertilizer_type_number)/2
 
 All_data_BO<- read.csv("C:/Users/surya/Downloads/SHERPA_dataset/Cropl_land_Eur_reg1.csv")
 
@@ -815,7 +815,7 @@ Cropland6<- Cropland1[,c(2,109)]
 Cropland7<- merge(Cropland_part1, Cropland6, by = "POINTID")
 
 
-Cropland7$Final_number<- Cropland7$Part2-Cropland7$Part1_number_avg
+Cropland7$Final_number<- Cropland7$Part1-Cropland7$Part2_number_avg
 
 Cropland7<- Cropland7[!is.na(Cropland7$Final_number),]
 
@@ -834,7 +834,7 @@ old_names <- c(
   "Nickel_number", "Mercury_number", "Cobalt_number", "Chromium_number", "Copper_number",
   "Cadmium_number", "Arsenic_number", "EC_number", "Nitrogen_number",
   "Phophorus_number_excess", "Phophorus_number_mining", "Pesticide_Risk_Score", "soc_final_number",
-  "Soil_bulk_density_score", "Part1_number_avg","Part2", "Final_number"
+  "Soil_bulk_density_score", "Part2_number_avg","Part1", "Final_number"
 )
 
 new_names <- c(
@@ -1277,16 +1277,16 @@ Grassland4 <- Grassland4 %>%
 
 ########################################################
 
-Grassland4$Part1_number<- Grassland4$Phophorus_number_excess+Grassland4$Nitrogen_number+Grassland4$EC_number+Grassland4$Arsenic_number+Grassland4$Cadmium_number+
+Grassland4$Part2_number<- Grassland4$Phophorus_number_excess+Grassland4$Nitrogen_number+Grassland4$EC_number+Grassland4$Arsenic_number+Grassland4$Cadmium_number+
    Grassland4$Copper_number+Grassland4$Chromium_number+Grassland4$Cobalt_number+Grassland4$Mercury_number+Grassland4$Nickel_number+Grassland4$Lead_number+Grassland4$Antimony_numb+
   Grassland4$Zinc_number+Grassland4$Soil_erosion_number+Grassland4$Soil_bulk_density_score+Grassland4$soc_final_number+
    Grassland4$LS_number
  
-Grassland4<- Grassland4[!is.na(Grassland4$Part1_number),]
+Grassland4<- Grassland4[!is.na(Grassland4$Part2_number),]
 
-Grassland4$Part1_number_avg<- (Grassland4$Part1_number/17)
+Grassland4$Part2_number_avg<- (Grassland4$Part2_number/17)
 
-hist(Grassland4$Part1_number_avg)
+hist(Grassland4$Part2_number_avg)
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
@@ -1308,7 +1308,7 @@ counts <- All_data_BO %>%
   group_by(Class) %>%
   summarise(Count = n())
 
-All_data_BO$part22<- 0-All_data_BO$Part1_number_avg
+All_data_BO$part22<- 0-All_data_BO$Part2_number_avg
 
 my_colors <- c(
   c("#7fbf4d","#d864a6","#ffbf33","#4a98c9") 
@@ -1399,7 +1399,7 @@ test<- merge(Grasslandpart1, Grassland1, by = "POINTID")
 
 ## Calculating final score by subtracting part2 (Fcover_number) with part1 
 
-test$Final_number<- test$Fcover_number-test$Part1_number_avg
+test$Final_number<- test$Fcover_number-test$Part2_number_avg
 
 test<- test[!is.na(test$Final_number),]
 
@@ -1417,7 +1417,7 @@ old_names <- c(
   "Nickel_number", "Mercury_number", "Cobalt_number", "Chromium_number", "Copper_number", 
   "Cadmium_number", "Arsenic_number", "EC_number", "Nitrogen_number", 
   "Phophorus_number_excess", "soc_final_number", 
-  "Soil_bulk_density_score", "Part1_number_avg", "Fcover_number", "Final_number"
+  "Soil_bulk_density_score", "Part2_number_avg", "Fcover_number", "Final_number"
 )
 
 new_names <- c(
